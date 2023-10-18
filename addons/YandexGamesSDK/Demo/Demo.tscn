@@ -1,0 +1,212 @@
+[gd_scene load_steps=2 format=2]
+
+[ext_resource path="res://addons/YandexGamesSDK/Demo/Demo.gd" type="Script" id=1]
+
+[node name="Demo" type="Control"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+script = ExtResource( 1 )
+money = 10
+path_score_label = NodePath("CenterContainer/VBoxContainer/HBoxContainer/VBoxContainer/HBoxContainer/LabelScore")
+path_money_label = NodePath("CenterContainer/VBoxContainer/HBoxContainer/VBoxContainer2/Label_Money")
+
+[node name="CenterContainer" type="CenterContainer" parent="."]
+anchor_right = 1.0
+anchor_bottom = 1.0
+
+[node name="VBoxContainer" type="VBoxContainer" parent="CenterContainer"]
+margin_left = 294.0
+margin_top = 141.0
+margin_right = 730.0
+margin_bottom = 459.0
+
+[node name="TextEdit" type="TextEdit" parent="CenterContainer/VBoxContainer"]
+margin_right = 436.0
+margin_bottom = 60.0
+rect_min_size = Vector2( 0, 60 )
+text = "	Project -> Export -> HTML
+	Head Include (add a line below)
+	<script src=\"https://yandex.ru/games/sdk/v2\"></script>"
+readonly = true
+
+[node name="HBoxContainer" type="HBoxContainer" parent="CenterContainer/VBoxContainer"]
+margin_top = 64.0
+margin_right = 436.0
+margin_bottom = 318.0
+custom_constants/separation = 8
+
+[node name="VBoxContainer" type="VBoxContainer" parent="CenterContainer/VBoxContainer/HBoxContainer"]
+margin_right = 190.0
+margin_bottom = 254.0
+rect_min_size = Vector2( 190, 0 )
+custom_constants/separation = 6
+
+[node name="HBoxContainer" type="HBoxContainer" parent="CenterContainer/VBoxContainer/HBoxContainer/VBoxContainer"]
+margin_right = 190.0
+margin_bottom = 20.0
+
+[node name="Button_Score" type="Button" parent="CenterContainer/VBoxContainer/HBoxContainer/VBoxContainer/HBoxContainer"]
+margin_right = 79.0
+margin_bottom = 20.0
+mouse_default_cursor_shape = 2
+text = "Score += 1"
+align = 0
+
+[node name="LabelScore" type="Label" parent="CenterContainer/VBoxContainer/HBoxContainer/VBoxContainer/HBoxContainer"]
+margin_left = 83.0
+margin_top = 3.0
+margin_right = 134.0
+margin_bottom = 17.0
+text = "Score: 1"
+
+[node name="Button_showFullscreenAdv" type="Button" parent="CenterContainer/VBoxContainer/HBoxContainer/VBoxContainer"]
+margin_top = 26.0
+margin_right = 190.0
+margin_bottom = 46.0
+mouse_default_cursor_shape = 2
+text = "showFullscreenAdv()"
+align = 0
+
+[node name="Button_showRewardedVideo" type="Button" parent="CenterContainer/VBoxContainer/HBoxContainer/VBoxContainer"]
+margin_top = 52.0
+margin_right = 190.0
+margin_bottom = 72.0
+mouse_default_cursor_shape = 2
+text = "showRewardedVideo(\"test\")"
+align = 0
+
+[node name="Button_getPlayer_scopes_false" type="Button" parent="CenterContainer/VBoxContainer/HBoxContainer/VBoxContainer"]
+margin_top = 78.0
+margin_right = 190.0
+margin_bottom = 98.0
+mouse_default_cursor_shape = 2
+text = "getPlayer(scopes:false)"
+align = 0
+
+[node name="Button_getPlayer_scopes_true" type="Button" parent="CenterContainer/VBoxContainer/HBoxContainer/VBoxContainer"]
+margin_top = 104.0
+margin_right = 190.0
+margin_bottom = 124.0
+mouse_default_cursor_shape = 2
+text = "getPlayer(scopes:true)"
+align = 0
+
+[node name="Button_getPlayer_setData" type="Button" parent="CenterContainer/VBoxContainer/HBoxContainer/VBoxContainer"]
+margin_top = 130.0
+margin_right = 190.0
+margin_bottom = 150.0
+mouse_default_cursor_shape = 2
+text = "setData(Score)"
+align = 0
+
+[node name="Button_getPlayer_getData" type="Button" parent="CenterContainer/VBoxContainer/HBoxContainer/VBoxContainer"]
+margin_top = 156.0
+margin_right = 190.0
+margin_bottom = 176.0
+mouse_default_cursor_shape = 2
+text = "getData(Score)"
+align = 0
+
+[node name="Button_getLang" type="Button" parent="CenterContainer/VBoxContainer/HBoxContainer/VBoxContainer"]
+margin_top = 182.0
+margin_right = 190.0
+margin_bottom = 202.0
+mouse_default_cursor_shape = 2
+text = "getLang()"
+align = 0
+
+[node name="VBoxContainer2" type="VBoxContainer" parent="CenterContainer/VBoxContainer/HBoxContainer"]
+margin_left = 198.0
+margin_right = 436.0
+margin_bottom = 254.0
+rect_min_size = Vector2( 190, 0 )
+custom_constants/separation = 6
+
+[node name="Label_Money" type="Label" parent="CenterContainer/VBoxContainer/HBoxContainer/VBoxContainer2"]
+margin_right = 238.0
+margin_bottom = 20.0
+rect_min_size = Vector2( 0, 20 )
+text = "Money: 1"
+valign = 1
+
+[node name="Button_getPlayer_getPayments" type="Button" parent="CenterContainer/VBoxContainer/HBoxContainer/VBoxContainer2"]
+margin_top = 26.0
+margin_right = 238.0
+margin_bottom = 46.0
+mouse_default_cursor_shape = 2
+text = "getPayments()"
+align = 0
+
+[node name="Button_purchase" type="Button" parent="CenterContainer/VBoxContainer/HBoxContainer/VBoxContainer2"]
+margin_top = 52.0
+margin_right = 238.0
+margin_bottom = 72.0
+text = "purchase(id:1)"
+align = 0
+
+[node name="Button_getPurchases" type="Button" parent="CenterContainer/VBoxContainer/HBoxContainer/VBoxContainer2"]
+margin_top = 78.0
+margin_right = 238.0
+margin_bottom = 98.0
+text = "getPurchases()"
+align = 0
+
+[node name="Button_getLeaderboards" type="Button" parent="CenterContainer/VBoxContainer/HBoxContainer/VBoxContainer2"]
+margin_top = 104.0
+margin_right = 238.0
+margin_bottom = 124.0
+text = "getLeaderboards()"
+align = 0
+
+[node name="Button_setLeaderboardScore_yield" type="Button" parent="CenterContainer/VBoxContainer/HBoxContainer/VBoxContainer2"]
+margin_top = 130.0
+margin_right = 238.0
+margin_bottom = 150.0
+text = "setLeaderboardScore_yield(\"score\")"
+align = 0
+
+[node name="Button_canReview" type="Button" parent="CenterContainer/VBoxContainer/HBoxContainer/VBoxContainer2"]
+margin_top = 156.0
+margin_right = 238.0
+margin_bottom = 176.0
+text = "canReview()"
+align = 0
+
+[node name="Button_requestReview" type="Button" parent="CenterContainer/VBoxContainer/HBoxContainer/VBoxContainer2"]
+margin_top = 182.0
+margin_right = 238.0
+margin_bottom = 202.0
+text = "requestReview()"
+align = 0
+
+[node name="Button_canShowPrompt" type="Button" parent="CenterContainer/VBoxContainer/HBoxContainer/VBoxContainer2"]
+margin_top = 208.0
+margin_right = 238.0
+margin_bottom = 228.0
+text = "canShowPrompt()"
+align = 0
+
+[node name="Button_showPrompt" type="Button" parent="CenterContainer/VBoxContainer/HBoxContainer/VBoxContainer2"]
+margin_top = 234.0
+margin_right = 238.0
+margin_bottom = 254.0
+text = "showPrompt()"
+align = 0
+
+[connection signal="pressed" from="CenterContainer/VBoxContainer/HBoxContainer/VBoxContainer/HBoxContainer/Button_Score" to="." method="_on_Button_Score_pressed"]
+[connection signal="pressed" from="CenterContainer/VBoxContainer/HBoxContainer/VBoxContainer/Button_showFullscreenAdv" to="." method="_on_Button_showFullscreenAdv_pressed"]
+[connection signal="pressed" from="CenterContainer/VBoxContainer/HBoxContainer/VBoxContainer/Button_showRewardedVideo" to="." method="_on_Button_showRewardedVideo_pressed"]
+[connection signal="pressed" from="CenterContainer/VBoxContainer/HBoxContainer/VBoxContainer/Button_getPlayer_scopes_false" to="." method="_on_Button_getPlayer_scopes_false_pressed"]
+[connection signal="pressed" from="CenterContainer/VBoxContainer/HBoxContainer/VBoxContainer/Button_getPlayer_scopes_true" to="." method="_on_Button_getPlayer_scopes_true_pressed"]
+[connection signal="pressed" from="CenterContainer/VBoxContainer/HBoxContainer/VBoxContainer/Button_getPlayer_setData" to="." method="_on_Button_getPlayer_setData_pressed"]
+[connection signal="pressed" from="CenterContainer/VBoxContainer/HBoxContainer/VBoxContainer/Button_getPlayer_getData" to="." method="_on_Button_getPlayer_getData_pressed"]
+[connection signal="pressed" from="CenterContainer/VBoxContainer/HBoxContainer/VBoxContainer/Button_getLang" to="." method="_on_Button_getLang_pressed"]
+[connection signal="pressed" from="CenterContainer/VBoxContainer/HBoxContainer/VBoxContainer2/Button_getPlayer_getPayments" to="." method="_on_Button_getPlayer_getPayments_pressed"]
+[connection signal="pressed" from="CenterContainer/VBoxContainer/HBoxContainer/VBoxContainer2/Button_purchase" to="." method="_on_Button_purchase_pressed"]
+[connection signal="pressed" from="CenterContainer/VBoxContainer/HBoxContainer/VBoxContainer2/Button_getPurchases" to="." method="_on_Button_getPurchases_pressed"]
+[connection signal="pressed" from="CenterContainer/VBoxContainer/HBoxContainer/VBoxContainer2/Button_getLeaderboards" to="." method="_on_Button_getLeaderboards_pressed"]
+[connection signal="pressed" from="CenterContainer/VBoxContainer/HBoxContainer/VBoxContainer2/Button_setLeaderboardScore_yield" to="." method="_on_Button_setLeaderboardScore_yield_pressed"]
+[connection signal="pressed" from="CenterContainer/VBoxContainer/HBoxContainer/VBoxContainer2/Button_canReview" to="." method="_on_Button_canReview_pressed"]
+[connection signal="pressed" from="CenterContainer/VBoxContainer/HBoxContainer/VBoxContainer2/Button_requestReview" to="." method="_on_Button_requestReview_pressed"]
+[connection signal="pressed" from="CenterContainer/VBoxContainer/HBoxContainer/VBoxContainer2/Button_canShowPrompt" to="." method="_on_Button_canShowPrompt_pressed"]
+[connection signal="pressed" from="CenterContainer/VBoxContainer/HBoxContainer/VBoxContainer2/Button_showPrompt" to="." method="_on_Button_showPrompt_pressed"]
