@@ -7,7 +7,7 @@ signal on_showRewardedVideo(success, ad_name) # success:bool, ad_name:String
 signal on_getData(data) # data:Dictionary
 signal on_getPlayer(player) # player:JavaScriptObject
 signal on_purchase_then(product_id) # product_id:String ("int")
-signal on_purchase_catch(args)  
+signal on_purchase_catch(product_id)  
 signal on_getPurchases_then(purchases) # purchases:Array [productID:String]
 signal on_getPurchases_catch()
 signal on_getLeaderboards()
@@ -329,6 +329,7 @@ func js_callback_getPurchases_catch(args:Array):
 		print("%s js_callback_getPurchases_then(args:%s)"%[_print, args])
 		var js_console:JavaScriptObject = JavaScript.get_interface("console")
 		js_console.log(args[0])
+	emit_signal("on_getPurchases_catch")
 
 # https://yandex.ru/dev/games/doc/en/sdk/sdk-leaderboard
 # Leaderboards
@@ -350,15 +351,15 @@ func js_callback_getLeaderboards(args:Array):
 	emit_signal("on_getLeaderboards")
 
 # Leaderboards - New score - setLeaderboardScore()
-func setLeaderboardScore_yield(leaderboardName:String, score:int):
-	if _print_debug: print("%s setLeaderboardScore_yield()"%[_print])
+func setLeaderboardScore(leaderboardName:String, score:int):
+	if _print_debug: print("%s setLeaderboardScore()"%[_print])
 	if !OS.has_feature("HTML5"):
-		if _print_debug: print("%s, setLeaderboardScore_yield(leaderboardName:%s, score:%s) !OS.has_feature('HTML5') - addon doesn't work, platform is not html"%[_print, leaderboardName, score])
+		if _print_debug: print("%s, setLeaderboardScore(leaderboardName:%s, score:%s) !OS.has_feature('HTML5') - addon doesn't work, platform is not html"%[_print, leaderboardName, score])
 		return
 	if !is_initGame: return
 	if js_ysdk_lb == null:
 		if _print_debug:
-			print("%s setLeaderboardScore_yield(leaderboardName:%s, score:%s) js_ysdk_lb == null"%[_print, leaderboardName, score])
+			print("%s setLeaderboardScore(leaderboardName:%s, score:%s) js_ysdk_lb == null"%[_print, leaderboardName, score])
 		return
 	_current_isAvailableMethod = 'leaderboards.setLeaderboardScore'
 	js_ysdk.isAvailableMethod('leaderboards.setLeaderboardScore').then(js_callback_isAvailableMethod)
@@ -366,9 +367,9 @@ func setLeaderboardScore_yield(leaderboardName:String, score:int):
 	if _current_isAvailableMethod_result == true:
 		js_ysdk_lb.setLeaderboardScore(leaderboardName, score)
 		if _print_debug:
-			print("%s setLeaderboardScore_yield() js_ysdk_lb.setLeaderboardScore(leaderboardName:%s, score:%s) request"%[_print, leaderboardName, score])
+			print("%s setLeaderboardScore() js_ysdk_lb.setLeaderboardScore(leaderboardName:%s, score:%s) request"%[_print, leaderboardName, score])
 	elif _print_debug:
-		print("%s setLeaderboardScore_yield() setLeaderboardScore(leaderboardName:%s, score:%s) isAvailableMethod('leaderboards.setLeaderboardScore') == false"%[_print, leaderboardName, score])
+		print("%s setLeaderboardScore() js_ysdk_lb.setLeaderboardScore(leaderboardName:%s, score:%s) isAvailableMethod('leaderboards.setLeaderboardScore') == false"%[_print, leaderboardName, score])
 
 func js_callback_isAvailableMethod(args:Array):
 	if _print_debug: print("%s js_callback_isAvailableMethod(args:%s)"%[_print, args])
@@ -387,6 +388,18 @@ func canReview():
 	if !is_initGame: return
 	js_ysdk.feedback.canReview().then(js_callback_canReview)
 
+func on_canReview_yield() -> bool:
+	if _print_debug: print("%s on_canReview_yield()"%[_print])
+	if !OS.has_feature("HTML5"):
+		if _print_debug: print("%s, on_canReview_yield() !OS.has_feature('HTML5') - addon doesn't work, platform is not html"%[_print])
+		return false
+	if !is_initGame: return false
+	var result:bool 
+	canReview()
+	yield(self, "on_canReview")
+	result = _current_canReview
+	return result
+
 func js_callback_canReview(args:Array):
 	if _print_debug: 
 		print("%s js_callback_canReview(args:%s)"%[_print, args])
@@ -396,12 +409,14 @@ func js_callback_canReview(args:Array):
 		if _print_debug: 
 			print("%s js_callback_canReview(args:%s) canReview == true"%[_print, args])
 		_current_canReview = true
-		emit_signal("on_canReview")
+		emit_signal("on_canReview", true)
 	else:
 		if _print_debug: 
 			print("%s js_callback_canReview(args:%s) canReview == false"%[_print, args])
 			var js_console:JavaScriptObject = JavaScript.get_interface("console")
 			js_console.log(args[0]["reason"])
+		_current_canReview = false
+		emit_signal("on_canReview", false)
 
 # Game rating - requestReview()
 func requestReview():
@@ -459,6 +474,18 @@ func js_callback_canShowPrompt(args:Array):
 	_current_canShowPrompt = args[0].canShow
 	emit_signal("on_canShowPrompt", _current_canShowPrompt)
 
+func canShowPrompt_yield() -> bool:
+	if _print_debug: print("%s on_canReview_yield()"%[_print])
+	if !OS.has_feature("HTML5"):
+		if _print_debug: print("%s, on_canReview_yield() !OS.has_feature('HTML5') - addon doesn't work, platform is not html"%[_print])
+		return false
+	if !is_initGame: return false
+	var result:bool
+	canShowPrompt()
+	yield(self,"on_canShowPrompt")
+	result = _current_canShowPrompt
+	return result
+
 # Desktop shortcut - showPrompt()
 func showPrompt():
 	if _print_debug: print("%s showPrompt()"%[_print])
@@ -470,7 +497,6 @@ func showPrompt():
 	yield(self, "on_canShowPrompt")
 	if _current_canShowPrompt:
 		js_ysdk.shortcut.showPrompt().then(js_callback_showPrompt)
-		pass
 	elif _print_debug: print("%s showPrompt() _current_canShowPrompt = false"%[_print])
 
 func js_callback_showPrompt(args:Array):

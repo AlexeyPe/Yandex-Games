@@ -92,7 +92,7 @@ func _on_Button_getLeaderboards_pressed():
 	YandexGames.getLeaderboards()
 
 func _on_Button_setLeaderboardScore_yield_pressed():
-	YandexGames.setLeaderboardScore_yield("score", score)
+	YandexGames.setLeaderboardScore("score", score)
 
 
 func _on_Button_canReview_pressed():

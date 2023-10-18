@@ -43,7 +43,7 @@ YandexGames.purchase("id", true)
 YandexGames.connect("on_purchase_then", self, "on_purchase_then")
 YandexGames.connect("on_purchase_catch", self, "on_purchase_catch")
 
-# getPurchases(), signals on_getPurchases_then(purchases:Array [productID:String]), on_getPurchases_catch()
+# getPurchases(), signals on_getPurchases_then(purchases:Array[productID:String]),on_getPurchases_catch()
 YandexGames.getPurchases()
 YandexGames.connect("on_getPurchases_then", self, "on_getPurchases_then")
 YandexGames.connect("on_getPurchases_catch", self, "on_getPurchases_catch")

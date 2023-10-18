@@ -15,13 +15,13 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 
 [node name="VBoxContainer" type="VBoxContainer" parent="CenterContainer"]
-margin_left = 294.0
+margin_left = 312.0
 margin_top = 141.0
-margin_right = 730.0
+margin_right = 711.0
 margin_bottom = 459.0
 
 [node name="TextEdit" type="TextEdit" parent="CenterContainer/VBoxContainer"]
-margin_right = 436.0
+margin_right = 399.0
 margin_bottom = 60.0
 rect_min_size = Vector2( 0, 60 )
 text = "	Project -> Export -> HTML
@@ -31,7 +31,7 @@ readonly = true
 
 [node name="HBoxContainer" type="HBoxContainer" parent="CenterContainer/VBoxContainer"]
 margin_top = 64.0
-margin_right = 436.0
+margin_right = 399.0
 margin_bottom = 318.0
 custom_constants/separation = 8
 
@@ -117,13 +117,13 @@ align = 0
 
 [node name="VBoxContainer2" type="VBoxContainer" parent="CenterContainer/VBoxContainer/HBoxContainer"]
 margin_left = 198.0
-margin_right = 436.0
+margin_right = 399.0
 margin_bottom = 254.0
 rect_min_size = Vector2( 190, 0 )
 custom_constants/separation = 6
 
 [node name="Label_Money" type="Label" parent="CenterContainer/VBoxContainer/HBoxContainer/VBoxContainer2"]
-margin_right = 238.0
+margin_right = 201.0
 margin_bottom = 20.0
 rect_min_size = Vector2( 0, 20 )
 text = "Money: 1"
@@ -131,7 +131,7 @@ valign = 1
 
 [node name="Button_getPlayer_getPayments" type="Button" parent="CenterContainer/VBoxContainer/HBoxContainer/VBoxContainer2"]
 margin_top = 26.0
-margin_right = 238.0
+margin_right = 201.0
 margin_bottom = 46.0
 mouse_default_cursor_shape = 2
 text = "getPayments()"
@@ -139,56 +139,56 @@ align = 0
 
 [node name="Button_purchase" type="Button" parent="CenterContainer/VBoxContainer/HBoxContainer/VBoxContainer2"]
 margin_top = 52.0
-margin_right = 238.0
+margin_right = 201.0
 margin_bottom = 72.0
 text = "purchase(id:1)"
 align = 0
 
 [node name="Button_getPurchases" type="Button" parent="CenterContainer/VBoxContainer/HBoxContainer/VBoxContainer2"]
 margin_top = 78.0
-margin_right = 238.0
+margin_right = 201.0
 margin_bottom = 98.0
 text = "getPurchases()"
 align = 0
 
 [node name="Button_getLeaderboards" type="Button" parent="CenterContainer/VBoxContainer/HBoxContainer/VBoxContainer2"]
 margin_top = 104.0
-margin_right = 238.0
+margin_right = 201.0
 margin_bottom = 124.0
 text = "getLeaderboards()"
 align = 0
 
 [node name="Button_setLeaderboardScore_yield" type="Button" parent="CenterContainer/VBoxContainer/HBoxContainer/VBoxContainer2"]
 margin_top = 130.0
-margin_right = 238.0
+margin_right = 201.0
 margin_bottom = 150.0
-text = "setLeaderboardScore_yield(\"score\")"
+text = "setLeaderboardScore(\"score\")"
 align = 0
 
 [node name="Button_canReview" type="Button" parent="CenterContainer/VBoxContainer/HBoxContainer/VBoxContainer2"]
 margin_top = 156.0
-margin_right = 238.0
+margin_right = 201.0
 margin_bottom = 176.0
 text = "canReview()"
 align = 0
 
 [node name="Button_requestReview" type="Button" parent="CenterContainer/VBoxContainer/HBoxContainer/VBoxContainer2"]
 margin_top = 182.0
-margin_right = 238.0
+margin_right = 201.0
 margin_bottom = 202.0
 text = "requestReview()"
 align = 0
 
 [node name="Button_canShowPrompt" type="Button" parent="CenterContainer/VBoxContainer/HBoxContainer/VBoxContainer2"]
 margin_top = 208.0
-margin_right = 238.0
+margin_right = 201.0
 margin_bottom = 228.0
 text = "canShowPrompt()"
 align = 0
 
 [node name="Button_showPrompt" type="Button" parent="CenterContainer/VBoxContainer/HBoxContainer/VBoxContainer2"]
 margin_top = 234.0
-margin_right = 238.0
+margin_right = 201.0
 margin_bottom = 254.0
 text = "showPrompt()"
 align = 0
