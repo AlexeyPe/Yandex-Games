@@ -2,7 +2,7 @@
 Yandex Games SDK for Godot 3.5
 * Godot 4 - If JavaScript and JavaScriptObject work the same way as in 3, then try it, you will also need to solve the issue with the header files of version 4
 
-__My Telegram [Alexey_Pe](https://t.me/Alexey_Pe)__
+__My Telegram [@Alexey_Pe](https://t.me/Alexey_Pe)__
 
 ### Demo
 ![Godot_v3 5 2-stable_win64_2VZ4Kjfri6](https://github.com/AlexeyPe/Yandex-Games/assets/70694988/2299402b-3eb3-470c-bcff-19380b65972f)
