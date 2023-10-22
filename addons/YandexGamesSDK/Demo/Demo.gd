@@ -41,29 +41,23 @@ func _on_Button_Score_pressed():
 	score += 1
 	get_node(path_score_label).text = "Score: %s"%[score]
 
-
 func _on_Button_showFullscreenAdv_pressed():
 	YandexGames.showFullscreenAdv()
-
 
 func _on_Button_showRewardedVideo_pressed():
 	YandexGames.showRewardedVideo("test")
 
-
 func _on_Button_getPlayer_scopes_false_pressed():
 	YandexGames.getPlayer(false)
 
-
 func _on_Button_getPlayer_scopes_true_pressed():
 	YandexGames.getPlayer(true)
-
 
 func _on_Button_getPlayer_setData_pressed():
 	YandexGames.setData({
 		"score": score,
 		"money": money,
 	})
-
 
 func _on_Button_getPlayer_getData_pressed():
 	var data:Dictionary = yield(YandexGames.getData_yield(), "completed")
@@ -74,10 +68,8 @@ func _on_Button_getPlayer_getData_pressed():
 		money = data["money"]
 		get_node(path_money_label).text = "Money: %s"%[money]
 
-
 func _on_Button_getPlayer_getPayments_pressed():
 	YandexGames.getPayments()
-
 
 func _on_Button_purchase_pressed():
 	# true = is consumed. Reusable purchase (not added to the list getPayments())
@@ -91,9 +83,8 @@ func _on_Button_getPurchases_pressed():
 func _on_Button_getLeaderboards_pressed():
 	YandexGames.getLeaderboards()
 
-func _on_Button_setLeaderboardScore_yield_pressed():
-	YandexGames.setLeaderboardScore("score", score)
-
+func _on_Button_setLeaderboardScore_pressed():
+	YandexGames.setLeaderboardScore("test", score)
 
 func _on_Button_canReview_pressed():
 	YandexGames.canReview()
@@ -101,17 +92,21 @@ func _on_Button_canReview_pressed():
 func _on_Button_requestReview_pressed():
 	YandexGames.requestReview()
 
-
 func _on_Button_getLang_pressed():
 	YandexGames.getLang()
-	pass # Replace with function body.
-
 
 func _on_Button_canShowPrompt_pressed():
 	YandexGames.canShowPrompt()
-	pass # Replace with function body.
-
 
 func _on_Button_showPrompt_pressed():
 	YandexGames.showPrompt()
-	pass # Replace with function body.
+
+func _on_Button_getLeaderboardDescription_pressed():
+	YandexGames.getLeaderboardDescription("test")
+
+func _on_Button_getLeaderboardPlayerEntry_pressed():
+	YandexGames.getLeaderboardPlayerEntry("test")
+
+func _on_Button_getLeaderboardEntries_pressed():
+	YandexGames.getLeaderboardEntries("test")
+
