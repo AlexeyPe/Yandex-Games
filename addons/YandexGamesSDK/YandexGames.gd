@@ -448,7 +448,8 @@ func getLang() -> String:
 		return result
 	if !is_initGame: return result
 	if js_ysdk_player == null:
-		if _print_debug: print("%s getLang() js_ysdk_player == null, result = null"%[_print])
+		result = js_ysdk.environment.i18n.lang
+		if _print_debug: print("%s getLang() js_ysdk_player == null, result: %s"%[_print, result])
 		return result
 	else:
 		result = js_ysdk_player._personalInfo.lang
