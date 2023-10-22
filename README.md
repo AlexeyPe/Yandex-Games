@@ -37,6 +37,9 @@ getData()
 YandexGames.connect("on_getData", self, "on_getData")
 ```
 #### Purchases
+For purchases, you need to create purchases in the draft and add your login - this is enough for tests. (when buying, it will be written that it is a test)
+
+For the release, you will need to write to Yandex to enable purchases
 ``` gdscript
 # In-game purchases, purchase(id:String, consume_purchase:bool)
 # signals on_purchase_then(product_id:String) and on_purchase_catch(product_id:String)
@@ -52,9 +55,32 @@ YandexGames.connect("on_getPurchases_then", self, "on_getPurchases_then")
 YandexGames.connect("on_getPurchases_catch", self, "on_getPurchases_catch")
 ```
 #### Leaderboards
+For a leaderboard, you should have a leaderboard (or several) created in your draft.
+
+You can also select the main leaderboard in the settings ('default'(bool) in the response)
+https://yandex.ru/dev/games/doc/en/sdk/sdk-leaderboard#response-format2
 ``` gdscript
-# Leaderboards - setLeaderboardScore(Leaderboard_name:String, score:int) 
+# setLeaderboardScore(Leaderboard_name:String, score:int) 
 YandexGames.setLeaderboardScore("Leaderboard_name", 1000)
+
+# getLeaderboardDescription(leaderboardName:String), signal on_getLeaderboardDescription(description:Dictionary)
+# description:{appID:String, default:bool, invert_sort_order:bool, decimal_offset:int, type:String, name:String, title:{en:String, ru:String ..}}
+YandexGames.getLeaderboardDescription("Leaderboard_name")
+
+# getLeaderboardPlayerEntry(leaderboardName:String)
+# signals on_getLeaderboardPlayerEntry_then(response:Dictionary), on_getLeaderboardPlayerEntry_catch(err_code:String)
+# response { score:int, extraData:String, rank:int, getAvatarSrc:String, getAvatarSrcSet:String, lang:String, publicName:String, uniqueID:String, scopePermissions_avatar:String, scopePermissions_public_name:String, formattedScore:String}
+# response, getAvatarSrc and getAvatarSrcSet - is JavaScriptObject(Function maybe?) return String. I didn't understand how to use it
+YandexGames.getLeaderboardPlayerEntry("Leaderboard_name")
+YandexGames.connect("on_getLeaderboardPlayerEntry_then", self, "on_getLeaderboardPlayerEntry_then")
+YandexGames.connect("on_getLeaderboardPlayerEntry_catch", self, "on_getLeaderboardPlayerEntry_catch")
+
+# getLeaderboardEntries(leaderboardName:String), signal on_getLeaderboardEntries(response:Dictionary)
+# response { leaderboard:Dictionary, userRank:int, entries:Array}
+# leaderboard - getLeaderboardDescription response
+# entries - top 20 and 10-20(up/down) players around the player who requested. entries element - getLeaderboardPlayerEntry response
+YandexGames.getLeaderboardEntries("Leaderboard_name")
+YandexGames.connect("on_getLeaderboardEntries", self, "on_getLeaderboardEntries")
 ```
 #### Review
 ``` gdscript
