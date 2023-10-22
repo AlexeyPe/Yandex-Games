@@ -69,7 +69,7 @@ YandexGames.getLeaderboardDescription("Leaderboard_name")
 
 # getLeaderboardPlayerEntry(leaderboardName:String)
 # signals on_getLeaderboardPlayerEntry_then(response:Dictionary), on_getLeaderboardPlayerEntry_catch(err_code:String)
-# response { score:int, extraData:String, rank:int, getAvatarSrc:String, getAvatarSrcSet:String, lang:String, publicName:String, uniqueID:String, scopePermissions_avatar:String, scopePermissions_public_name:String, formattedScore:String}
+# response { score:int, extraData:String, rank:int, getAvatarSrc:JavaScriptObject, getAvatarSrcSet:JavaScriptObject, lang:String, publicName:String, uniqueID:String, scopePermissions_avatar:String, scopePermissions_public_name:String, formattedScore:String}
 # response, getAvatarSrc and getAvatarSrcSet - is JavaScriptObject(Function maybe?) return String. I didn't understand how to use it
 YandexGames.getLeaderboardPlayerEntry("Leaderboard_name")
 YandexGames.connect("on_getLeaderboardPlayerEntry_then", self, "on_getLeaderboardPlayerEntry_then")

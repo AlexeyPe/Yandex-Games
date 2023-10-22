@@ -20,7 +20,7 @@ signal on_showPrompt(accepted) # accepted:bool
 # description:{appID:String, default:bool, invert_sort_order:bool, decimal_offset:int, type:String, name:String, title:{en:String, ru:String ..}}
 signal on_getLeaderboardDescription(description) # description:Dictionary
 # https://yandex.ru/dev/games/doc/en/sdk/sdk-leaderboard#response-format1
-# response:{score:int, extraData:String, rank:int, getAvatarSrc:String, getAvatarSrcSet:String, lang:String, publicName:String, uniqueID:String, scopePermissions_avatar:String, scopePermissions_public_name:String, formattedScore:String}
+# response:{score:int, extraData:String, rank:int, getAvatarSrc:JavaScriptObject, getAvatarSrcSet:JavaScriptObject, lang:String, publicName:String, uniqueID:String, scopePermissions_avatar:String, scopePermissions_public_name:String, formattedScore:String}
 signal on_getLeaderboardPlayerEntry_then(response) # response:Dictionary
 signal on_getLeaderboardPlayerEntry_catch(err_code) # err_code
 # https://yandex.ru/dev/games/doc/en/sdk/sdk-leaderboard#response-format2
