@@ -93,9 +93,9 @@ func _ready():
 		print("%s, _ready() OS.has_feature('HTML5') - addon works"%[_print])
 		initGame()
 		yield(self, "on_initGame")
-		getPlayer(false)
-		getPayments()
-		getLeaderboards()
+#		getPlayer(false)
+#		getPayments()
+#		getLeaderboards()
 	else:
 		print("%s, _ready() !OS.has_feature('HTML5') - addon doesn't work, platform is not html"%[_print])
 
@@ -118,6 +118,10 @@ func js_callback_initGame(args:Array):
 	js_ysdk.features.LoadingAPI.ready()
 	is_initGame = true
 	emit_signal("on_initGame")
+	getPlayer(false)
+	getPayments()
+	getLeaderboards()
+	getLang()
 	if _print_debug: print("%s js_callback_initGame(args:%s) is_initGame = true"%[_print, args])
 
 # https://yandex.ru/dev/games/doc/en/sdk/sdk-adv
