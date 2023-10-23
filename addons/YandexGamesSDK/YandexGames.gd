@@ -339,10 +339,6 @@ func js_callback_getLeaderboards(args:Array):
 func getLeaderboardDescription(leaderboardName:String):
 	if not _check_func_valid("getLeaderboardDescription", [leaderboardName]): return
 	if js_ysdk_lb == null:
-		if _print_debug:
-			print("%s getLeaderboardDescription(leaderboardName:%s) js_ysdk_lb == null"%[_print, leaderboardName])
-		return
-	if js_ysdk_lb == null:
 		if _print_debug: print("%s getLeaderboardDescription(leaderboardName:%s) js_ysdk_lb == null"%[_print, leaderboardName])
 		return
 	js_ysdk_lb.getLeaderboardDescription(leaderboardName).then(js_callback_getLeaderboardDescription)
