@@ -16,6 +16,7 @@ __My Telegram [@Alexey_Pe](https://t.me/Alexey_Pe)__
 * When the game starts, the addon automatically calls `initGame()`, `getPlayer(false)`, `getPayments()`, `getLeaderboards()`
 * For more understanding, you can read [YandexGames.gd](addons/YandexGamesSDK/YandexGames.gd) and sdk documentation
 #### Ads
+* After the release, commercial advertising will work after a few hours. Just wait
 ``` gdscript
 # Interstitial Ads, signal on_showFullscreenAdv(wasShown:bool)
 YandexGames.showFullscreenAdv()
@@ -24,6 +25,15 @@ YandexGames.connect("on_showFullscreenAdv", self, "on_showFullscreenAdv")
 # Rewarded Ads, signal on_showRewardedVideo(success:bool, current_rewarded_ad_name:String)
 YandexGames.showRewardedVideo(new_current_rewarded_ad_name) 
 YandexGames.connect("on_showRewardedVideo", self, "on_showRewardedVideo")
+# example use
+# new_current_rewarded_ad_name - this argument is not passed to yandex. I added it for signal and match
+func on_showRewardedVideo(success:bool, ad_name:String):
+  if not success:
+    print("on_showRewardedVideo(success:%s, ad_name:%s)"%[false, ad_name])
+    return
+  match ad_name:
+    "increase mine production": pass
+    "something else": pass
 ```
 #### Save/Load
 ``` gdscript
@@ -58,7 +68,8 @@ YandexGames.connect("on_getPurchases_catch", self, "on_getPurchases_catch")
 For a leaderboard, you should have a leaderboard (or several) created in your draft.
 
 You can also select the main leaderboard in the settings ('default'(bool) in the response)
-https://yandex.ru/dev/games/doc/en/sdk/sdk-leaderboard#response-format2
+
+[Link to the leaderboard documentation](https://yandex.ru/dev/games/doc/en/sdk/sdk-leaderboard#response-format2)
 ``` gdscript
 # setLeaderboardScore(Leaderboard_name:String, score:int) 
 YandexGames.setLeaderboardScore("Leaderboard_name", 1000)
@@ -81,6 +92,13 @@ YandexGames.connect("on_getLeaderboardPlayerEntry_catch", self, "on_getLeaderboa
 # entries - top 20 and 10-20(up/down) players around the player who requested. entries element - getLeaderboardPlayerEntry response
 YandexGames.getLeaderboardEntries("Leaderboard_name")
 YandexGames.connect("on_getLeaderboardEntries", self, "on_getLeaderboardEntries")
+
+# example use
+func on_getLeaderboardEntries(response:Dictionary):
+  match response["leaderboard"]["name"]:
+    "best_score": pass
+    "best_speed": pass
+    "aaa": pass
 ```
 #### Review
 ``` gdscript
