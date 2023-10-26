@@ -4,6 +4,7 @@ extends Node
 signal on_initGame()
 signal on_showFullscreenAdv(success) # success:bool
 signal on_showRewardedVideo(success, ad_name) # success:bool, ad_name:String 
+signal on_closeRewardedVideo(success, ad_name) # success:bool, ad_name:String 
 signal on_getData(data) # data:Dictionary
 signal on_getPlayer(player) # player:JavaScriptObject
 signal on_purchase_then(product_id) # product_id:String ("int")
@@ -161,7 +162,7 @@ func js_callback_showRewardedVideo_onClose(args:Array):
 	if _print_debug: print("%s js_callback_showRewardedVideo_onClose(args:%s)"%[_print, args])
 	var ad_name = current_rewarded_ad_name
 	current_rewarded_ad_name = ""
-	emit_signal("on_showRewardedVideo", true, ad_name)
+	emit_signal("on_closeRewardedVideo", true, ad_name)
 func js_callback_showRewardedVideo_onError(args:Array):
 	if _print_debug: print("%s js_callback_showRewardedVideo_onError(args:%s)"%[_print, args])
 	var ad_name = current_rewarded_ad_name
