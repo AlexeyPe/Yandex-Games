@@ -3,8 +3,7 @@ extends Node
 
 signal on_initGame()
 signal on_showFullscreenAdv(success) # success:bool
-signal on_showRewardedVideo(success, ad_name) # success:bool, ad_name:String 
-signal on_closeRewardedVideo(success, ad_name) # success:bool, ad_name:String 
+signal on_showRewardedVideo(success, ad_name) # success:bool, ad_name:String
 signal on_getData(data) # data:Dictionary
 signal on_getPlayer(player) # player:JavaScriptObject
 signal on_purchase_then(product_id) # product_id:String ("int")
@@ -88,6 +87,7 @@ var _current_isAvailableMethod:String = "" # DO NOT USE! PRIVATE VARIABLE
 var _current_isAvailableMethod_result:bool # DO NOT USE! PRIVATE VARIABLE
 var _current_canReview:bool # DO NOT USE! PRIVATE VARIABLE
 var _current_canShowPrompt:bool # DO NOT USE! PRIVATE VARIABLE
+var _current_rewarded_success:bool # DO NOT USE! PRIVATE VARIABLE
 
 func _ready():
 	if OS.has_feature("HTML5"):
@@ -146,7 +146,8 @@ func js_callback_showFullscreenAdv_onError(args:Array):
 # Managing ads - showRewardedVideo()
 func showRewardedVideo(new_current_rewarded_ad_name:String):
 	if not _check_func_valid("showRewardedVideo", [new_current_rewarded_ad_name]): return
-	
+
+	_current_rewarded_success = false
 	current_rewarded_ad_name = new_current_rewarded_ad_name
 	var js_dictionary:JavaScriptObject = JavaScript.create_object("Object")
 	var js_dictionary_2:JavaScriptObject = JavaScript.create_object("Object")
@@ -162,17 +163,15 @@ func js_callback_showRewardedVideo_onClose(args:Array):
 	if _print_debug: print("%s js_callback_showRewardedVideo_onClose(args:%s)"%[_print, args])
 	var ad_name = current_rewarded_ad_name
 	current_rewarded_ad_name = ""
-	emit_signal("on_closeRewardedVideo", true, ad_name)
+	emit_signal("on_closeRewardedVideo", _current_rewarded_success, ad_name)
 func js_callback_showRewardedVideo_onError(args:Array):
 	if _print_debug: print("%s js_callback_showRewardedVideo_onError(args:%s)"%[_print, args])
 	var ad_name = current_rewarded_ad_name
-	current_rewarded_ad_name = ""
-	emit_signal("on_showRewardedVideo", false, ad_name)
+	_current_rewarded_success = false
+	emit_signal("on_showRewardedVideo", _current_rewarded_success, ad_name)
 func js_callback_showRewardedVideo_onRewarded(args:Array):
 	if _print_debug: print("%s js_callback_showRewardedVideo_onRewarded(args:%s)"%[_print, args])
-	var ad_name = current_rewarded_ad_name
-	current_rewarded_ad_name = ""
-	emit_signal("on_showRewardedVideo", true, ad_name)
+	_current_rewarded_success = true
 
 # https://yandex.ru/dev/games/doc/en/sdk/sdk-player#auth
 # Player details
