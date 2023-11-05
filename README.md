@@ -46,6 +46,41 @@ var load_save:Dictionary = yield(YandexGames.getData_yield(), "completed")
 getData()
 YandexGames.connect("on_getData", self, "on_getData")
 ```
+##### Save/Load - example
+``` gdscript
+# Create DataManager.gd signleton
+
+var can_load_data:bool = false
+
+func _ready():
+  YandexGames.connect("on_getPlayer", self, "on_getPlayer")
+
+func on_getPlayer(player): 
+  can_load_data = true
+  loadData()
+
+# Example call: a player has entered the game and does not have data, you need to get the data
+# loadData is a yield function, when you call it you want to write it like this: yield(DataManager.loadData_yield(self), "completed")
+# Why do you need to write yield: this means that you stop executing the code until the Yandex server sends you the data
+func loadData_yield(from:Object):
+  if YandexGames.js_ysdk_player == null: print("DataManager.gd loadData(from:%s) js_ysdk_player == null"%[from]); return
+  if can_load_data: print("DataManager.gd loadData(from:%s)"%[from]); return
+  else: print("DataManager.gd loadData(from:%s) !can_load_data"%[from])
+  var load_save:Dictionary = yield(YandexGames.getData_yield(), "completed")
+  # here you use the downloaded data from load_save
+  pass
+
+# Example call: a player upgraded an item by spending currency, you want to save it
+func saveData(from:Object):
+  print("DataManager.gd saveData(from:%s)"%[from])
+  if YandexGames.js_ysdk_player == null: print("DataManager.gd saveData(from:%s) js_ysdk_player == null"%[from]); return
+  # setData - overwrites a variable on the yandex server
+  # Create a dictionary in which you write down all the data that you need to save
+  # The dictionary will be converted to json, check that your data does not contain classes, you need to convert classes into data that can be stored in json
+  var data:Dictionary = {"gold":100, "inventory": "your_value", "etc":123}
+  YandexGames.setData(data)
+  pass
+```
 #### Purchases
 For purchases, you need to create purchases in the draft and add your login - this is enough for tests. (when buying, it will be written that it is a test)
 
