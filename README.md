@@ -36,8 +36,9 @@ func on_showRewardedVideo(success:bool, ad_name:String):
     "something else": pass
 ```
 #### Save/Load
-* authorization - getPlayer(bool) is called by default in YandexGames._ready() - getPlayer(false)
-* getPlayer(true) - to get the player's avatar image, the authorization window will be shown. getPlayer(false) - will not show windows
+* [link yandex documentation](https://yandex.ru/dev/games/doc/en/sdk/sdk-player). For save/load need Player object from getPlayer(bool)
+* getPlayer(bool) is called by default in YandexGames._ready() - getPlayer(false)
+* getPlayer(true) - to get the player's avatar image, the window will be shown. getPlayer(false) - will not show windows
 <img src="https://github.com/AlexeyPe/Yandex-Games/assets/70694988/70b21fec-32b4-434d-b47f-5245911958bf" width="250" />
 <img src="https://github.com/AlexeyPe/Yandex-Games/assets/70694988/51ccfecf-be80-4d66-966b-44a9cb54f011" width="250" />
 
