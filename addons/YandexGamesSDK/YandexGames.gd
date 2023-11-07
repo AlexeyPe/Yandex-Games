@@ -215,13 +215,16 @@ func setData(data:Dictionary):
 func getData():
 	if not _check_func_valid("getData", []): return
 	if js_ysdk_player == null: 
-		if _print_debug: print("%s getData(data) js_ysdk_player == null"%[_print])
+		if _print_debug: print("%s getData() js_ysdk_player == null"%[_print])
 		return
 	js_ysdk_player.getData().then(js_callback_getData)
 	return
 
 func getData_yield() -> Dictionary:
 	if not _check_func_valid("getData_yield", []): return
+	if js_ysdk_player == null: 
+		if _print_debug: print("%s getData_yield() js_ysdk_player == null"%[_print])
+		return
 	var result:Dictionary
 	getData()
 	yield(self, "on_getData")
