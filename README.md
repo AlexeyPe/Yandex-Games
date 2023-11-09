@@ -73,6 +73,7 @@ func loadData_yield(from:Object):
   if can_load_data: print("DataManager.gd loadData(from:%s)"%[from]); return
   else: print("DataManager.gd loadData(from:%s) !can_load_data"%[from])
   var load_save:Dictionary = yield(YandexGames.getData_yield(), "completed")
+  if load_save.empty(): pass # player logged in for the first time / there were no saves
   # here you use the downloaded data from load_save
   pass
 

@@ -61,6 +61,9 @@ func _on_Button_getPlayer_setData_pressed():
 
 func _on_Button_getPlayer_getData_pressed():
 	var data:Dictionary = yield(YandexGames.getData_yield(), "completed")
+	if data.empty():
+		print("_on_Button_getPlayer_getData_pressed getData_yield return data.empty()")
+		return
 	if data.has("score"): 
 		score = data["score"]
 		get_node(path_score_label).text = "Score: %s"%[score]

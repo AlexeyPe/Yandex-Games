@@ -233,9 +233,13 @@ func getData_yield() -> Dictionary:
 	return result
 
 func js_callback_getData(args:Array):
-	if _print_debug: print("js_callback_getData(args:%s)"%[args])
-	var js_console = JavaScript.get_interface("console")
-	var data:Dictionary = JSON.parse(args[0]["json_data"]).result
+	if _print_debug: 
+		print("js_callback_getData(args:%s)"%[args])
+		var js_console = JavaScript.get_interface("console")
+		js_console.log(args[0])
+	var data:Dictionary
+	if args[0].hasOwnProperty('json_data'):
+		data = JSON.parse(args[0]["json_data"]).result
 	if _print_debug: print("js_callback_getData data: ", data)
 	_get_data = data
 	emit_signal("on_getData", data)
