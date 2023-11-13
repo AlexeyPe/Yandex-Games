@@ -163,7 +163,7 @@ func js_callback_showRewardedVideo_onClose(args:Array):
 	if _print_debug: print("%s js_callback_showRewardedVideo_onClose(args:%s)"%[_print, args])
 	var ad_name = current_rewarded_ad_name
 	current_rewarded_ad_name = ""
-	emit_signal("on_closeRewardedVideo", _current_rewarded_success, ad_name)
+	emit_signal("on_showRewardedVideo", _current_rewarded_success, ad_name)
 func js_callback_showRewardedVideo_onError(args:Array):
 	if _print_debug: print("%s js_callback_showRewardedVideo_onError(args:%s)"%[_print, args])
 	var ad_name = current_rewarded_ad_name
