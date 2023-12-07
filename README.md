@@ -1,44 +1,75 @@
 # Yandex-Games
+[![Godot](https://img.shields.io/badge/Godot%20Engine-3.5.2-blue.svg)](https://github.com/godotengine/godot/)
+![GitHub License](https://img.shields.io/github/license/AlexeyPe/Yandex-Games)
+![GitHub Repo stars](https://img.shields.io/github/stars/AlexeyPe/Yandex-Games)
+
 * Yandex Games SDK for Godot 3.5
 * Godot 4 - If JavaScript and JavaScriptObject work the same way as in 3, then try it, you will also need to solve the issue with the header files of version 4
 
+__If you have ideas for improvement, write to [telegram](https://t.me/Alexey_Pe) / Issues / pull, I’ll read everything__
+
 __My Telegram [@Alexey_Pe](https://t.me/Alexey_Pe)__
 
-### Demo
+
+The game in which I used this addon: [Match 3 puzzle](https://yandex.ru/games/app/254609?lang=ru), the game has `saving/loading`, `rewarded/fullscreen advertising`, `purchases`, `call for feedback`
+
+## Demo
+Demo in folder [addons/YandexGamesSDK/Demo](addons/YandexGamesSDK/Demo)
+
+Contains simple code with comments
+
 ![Godot_v3 5 2-stable_win64_9DEAaFyNrE](https://github.com/AlexeyPe/Yandex-Games/assets/70694988/375a5ada-0400-4c00-b95d-00fae30b7520)
 
+## Table of developers who use this addon
+This addon is used by many developers, I added those who don’t mind ([write to me to add you](https://t.me/Alexey_Pe))
 
-### How Install
-1. Install and enable the addon in the settings
-2. Add `<script src="https://yandex.ru/games/sdk/v2"></script>` to Head Include (Project -> Export -> HTML)
+№ | Developer | Players |
+-- | -- | -- |
+1 | [Legatum Studio](https://yandex.ru/games/developer?name=Legatum%20Studio) | 100+ |
 
-### How use
+## How use
 * When the game starts, the addon automatically calls `initGame()`, `getPlayer(false)`, `getPayments()`, `getLeaderboards()`
 * For more understanding, you can read [YandexGames.gd](addons/YandexGamesSDK/YandexGames.gd) and sdk documentation
-#### Ads
+### Ads
 * After the release, commercial advertising will work after a few hours. Just wait
+* When calling an advertisement, check whether the advertisement is currently called. [link to video(bug)](https://disk.yandex.ru/i/sYeNKd5tYS4nEw)
 ``` gdscript
-# Interstitial Ads, signal on_showFullscreenAdv(wasShown:bool)
-YandexGames.showFullscreenAdv()
+# Interstitial Ads, signal on_showFullscreenAdv(wasShown:bool, ad_name:String)
+
+# ad_name - this argument is not passed to yandex. I added it for signal and match
+if YandexGames.current_fullscreen_ad_name == "":
+    YandexGames.showFullscreenAdv("ad_name")
 YandexGames.connect("on_showFullscreenAdv", self, "on_showFullscreenAdv")
 
-# Rewarded Ads, signal on_showRewardedVideo(success:bool, current_rewarded_ad_name:String)
-YandexGames.showRewardedVideo(new_current_rewarded_ad_name) 
-YandexGames.connect("on_showRewardedVideo", self, "on_showRewardedVideo")
-# example use
-# new_current_rewarded_ad_name - this argument is not passed to yandex. I added it for signal and match
-func on_showRewardedVideo(success:bool, ad_name:String):
-  if not success:
-    print("on_showRewardedVideo(success:%s, ad_name:%s)"%[false, ad_name])
-    return
-  match ad_name:
-    "increase mine production": pass
-    "something else": pass
+# example use signal
+func on_showFullscreenAdv(success:bool, ad_name:String):
+    match ad_name:
+        "advertising after loading the game": 
+            #your some code when the player closed this ad 
+            if success: pass
+            else: pass
 ```
-#### Save/Load
+``` gdscript
+# Rewarded Ads, signal on_showRewardedVideo(success:bool, current_rewarded_ad_name:String)
+
+# ad_name - this argument is not passed to yandex. I added it for signal and match
+if YandexGames.current_rewarded_ad_name == "":
+    YandexGames.showRewardedVideo(ad_name) 
+YandexGames.connect("on_showRewardedVideo", self, "on_showRewardedVideo")
+
+# example use signal
+func on_showRewardedVideo(success:bool, ad_name:String):
+    match ad_name:
+        "open chest for advertising": 
+            #your some code when the player closed this ad 
+            if success: pass
+            else: pass
+```
+### Save/Load
 * [link yandex documentation](https://yandex.ru/dev/games/doc/en/sdk/sdk-player). For save/load need Player object from getPlayer(bool)
 * getPlayer(bool) is called by default in YandexGames._ready() - getPlayer(false)
 * getPlayer(true) - to get the player's avatar image, the window will be shown. getPlayer(false) - will not show windows
+
 <img src="https://github.com/AlexeyPe/Yandex-Games/assets/70694988/70b21fec-32b4-434d-b47f-5245911958bf" width="250" />
 <img src="https://github.com/AlexeyPe/Yandex-Games/assets/70694988/51ccfecf-be80-4d66-966b-44a9cb54f011" width="250" />
 
@@ -52,7 +83,7 @@ var load_save:Dictionary = yield(YandexGames.getData_yield(), "completed")
 getData()
 YandexGames.connect("on_getData", self, "on_getData")
 ```
-##### Save/Load - example
+### Save/Load - example
 ``` gdscript
 # Create DataManager.gd signleton
 
@@ -88,25 +119,69 @@ func saveData(from:Object):
   YandexGames.setData(data)
   pass
 ```
-#### Purchases
-For purchases, you need to create purchases in the draft and add your login - this is enough for tests. (when buying, it will be written that it is a test)
-
-For the release, you will need to write to Yandex to enable purchases
+### Purchases
+* For purchases, you need to create purchases in the draft and add your login - this is enough for tests. 
+(when buying, it will be written that it is a test)
+* Before submitting the game for moderation, you need to write a letter to Yandex Games to enable purchases. 
+(You don't need to do this for tests.)
+* Yandex calls `on_purchase_then()` only when the player closes the window, keep this in mind. Links to [video 1](https://disk.yandex.ru/i/SYNSas6u8zj7nA) and [video 2](https://disk.yandex.ru/i/BtGWp7sw5PbEbA) (bugs)
+* How to solve problem with `on_purchase_then()` - you need to use `getPurchases()` when starting the game.
 ``` gdscript
-# In-game purchases, purchase(id:String, consume_purchase:bool)
-# signals on_purchase_then(product_id:String) and on_purchase_catch(product_id:String)
-# true = is consumed. Reusable purchase (not added to the list getPayments())
-# false = is not consumed. One-time purchase (added to the list getPayments())
-YandexGames.purchase("id", true)
+# In-game purchase, signals on_purchase_then(), on_purchase_catch()
+
+YandexGames.purchase("id")
 YandexGames.connect("on_purchase_then", self, "on_purchase_then")
 YandexGames.connect("on_purchase_catch", self, "on_purchase_catch")
 
-# getPurchases(), signals on_getPurchases_then(purchases:Array[productID:String]),on_getPurchases_catch()
-YandexGames.getPurchases()
-YandexGames.connect("on_getPurchases_then", self, "on_getPurchases_then")
-YandexGames.connect("on_getPurchases_catch", self, "on_getPurchases_catch")
+# example use signals
+func on_purchase_then(purchase:YandexGames.Purchase):
+	  match purchase.product_id:
+		    "id which you specified in the console":
+            # your code
+            
+            # purchase.consume() - delete a purchase from the getPurchases array
+            # In short, when a player buys, he must close the window to call on_purchase_then
+            # Moderators make a purchase without closing the window and refresh the page, which is why on_purchase_then is not called
+            purchase.consume()
+
+func on_purchase_then(product_id:String):
+    match product_id:
+        "1": pass
 ```
-#### Leaderboards
+``` gdscript
+# Getting the purchases array [YandexGames.Purchase], signals on_getPurchases()
+
+# The array contains only those Purchases for which consume() was not called
+
+YandexGames.getPurchases()
+YandexGames.connect("on_getPurchases", self, "on_getPurchases")
+
+# example use signals
+# purchases = Array [YandexGames.Purchase] or null
+func on_getPurchases(purchases):
+    if purchases == null: pass # your variant
+    for purchase in purchases:
+        match purchase.product_id:
+            "id which you specified in the console":
+                  # your code
+
+                  # check the comment on_purchase_then()
+                  purchase.consume()
+```
+``` gdscript
+# YandexGames.gd
+class Purchase:
+    # product_id from Yandex Console (You specify it yourself)
+	  var product_id:String
+	  var _js_purchase:JavaScriptObject
+	  func _init(__js_purchase:JavaScriptObject):
+		    product_id = __js_purchase.productID
+		    _js_purchase = __js_purchase
+    # consume() for to remove from array YandexGames.getPurchases() (on the Yandex side)
+    func consume():
+		    YandexGames.js_ysdk_payments.consumePurchase(_js_purchase.purchaseToken)
+```
+### Leaderboards
 For a leaderboard, you should have a leaderboard (or several) created in your draft.
 
 You can also select the main leaderboard in the settings ('default'(bool) in the response)
@@ -142,7 +217,7 @@ func on_getLeaderboardEntries(response:Dictionary):
     "best_speed": pass
     "aaa": pass
 ```
-#### Review
+### Review
 ``` gdscript
 # canReview() and on_canReview_yield()->bool, signal on_canReview(can_review:bool)
 var can_review = yield(YandexGames.on_canReview_yield(), "completed")
@@ -154,7 +229,7 @@ YandexGames.connect("on_canReview", self, "on_canReview")
 YandexGames.requestReview()
 YandexGames.connect("on_requestReview", self, "on_requestReview")
 ```
-#### Desktop shortcut (Yandex Browser Panel)
+### Desktop shortcut (Yandex Browser Panel)
 ``` gdscript
 # canShowPrompt() and canShowPrompt_yield()->bool, signal on_canShowPrompt(canShowPrompt:bool)
 var can_show_prompt = yield(YandexGames.canShowPrompt_yield(), "completed") 
@@ -166,7 +241,7 @@ YandexGames.connect("on_canShowPrompt", self, "on_canShowPrompt")
 YandexGames.on_showPrompt()
 YandexGames.connect("on_showPrompt", self, "on_showPrompt")
 ```
-#### Functions
+### Functions
 ``` gdscript
 # getLang() -> String (ru/en/tr/...)
 YandexGames.getLang()

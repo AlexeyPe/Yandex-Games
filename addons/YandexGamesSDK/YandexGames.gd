@@ -2,14 +2,15 @@ extends Node
 # autoload_singleton
 
 signal on_initGame()
-signal on_showFullscreenAdv(success) # success:bool
+signal on_showFullscreenAdv(success, ad_name) # success:bool
 signal on_showRewardedVideo(success, ad_name) # success:bool, ad_name:String
 signal on_getData(data) # data:Dictionary
 signal on_getPlayer(player) # player:JavaScriptObject
-signal on_purchase_then(product_id) # product_id:String ("int")
-signal on_purchase_catch(product_id)  
-signal on_getPurchases_then(purchases) # purchases:Array [productID:String]
-signal on_getPurchases_catch()
+signal on_getPayments(payments) # payments:JavaScriptObject
+signal on_get()
+signal on_purchase_then(purchase) # purchase:YandexGames.Purchase
+signal on_purchase_catch(purchase_id) # purchase_id:int
+signal on_getPurchases(purchases) # purchases: catch-Null/then-Array [YandexGames.Purchase]
 signal on_getLeaderboards()
 signal on_isAvailableMethod(aviable, method_name) # aviable:bool, method_name:String
 signal on_canReview(canReview) # canReview:bool
@@ -31,6 +32,12 @@ signal on_getLeaderboardEntries(response) # response:Dictionary
 const _print:String = "Addon:YandexGamesSDK, YandexGames.gd"
 var _print_debug:bool = true
 
+# now window open? (why: for other addons, for example audio)
+var now_fullscreen:bool = false
+var now_rewarded:bool = false
+var now_purchase:bool = false
+var now_review:bool = false
+
 # Game start - initGame()
 var js_callback_initGame = JavaScript.create_callback(self, "js_callback_initGame")
 # Managing ads - showFullscreenAdv()
@@ -48,8 +55,8 @@ var js_callback_getData = JavaScript.create_callback(self, "js_callback_getData"
 var js_callback_getPayments_then = JavaScript.create_callback(self, "js_callback_getPayments_then")
 var js_callback_getPayments_catch = JavaScript.create_callback(self, "js_callback_getPayments_catch")
 # In-game purchases - purchase()
-var js_callback_purchases_then = JavaScript.create_callback(self, "js_callback_purchases_then")
-var js_callback_purchases_catch = JavaScript.create_callback(self, "js_callback_purchases_catch")
+var js_callback_purchase_then = JavaScript.create_callback(self, "js_callback_purchase_then")
+var js_callback_purchase_catch = JavaScript.create_callback(self, "js_callback_purchase_catch")
 # In-game purchases - getPurchases()
 var js_callback_getPurchases_then = JavaScript.create_callback(self, "js_callback_getPurchases_then")
 var js_callback_getPurchases_catch = JavaScript.create_callback(self, "js_callback_getPurchases_catch")
@@ -77,24 +84,40 @@ var js_ysdk:JavaScriptObject
 var js_ysdk_player
 var js_ysdk_payments
 var js_ysdk_lb
-var current_rewarded_ad_name = ""
+var js_console
 
 var _saved_data_json:String = "" # DO NOT USE! PRIVATE VARIABLE
 var _get_data:Dictionary # DO NOT USE! PRIVATE VARIABLE
-var _current_purchase_is_consume:bool # DO NOT USE! PRIVATE VARIABLE
-var _current_purchase_produc_id:String = "" # DO NOT USE! PRIVATE VARIABLE
+var _current_purchase_product_id:String = "" # DO NOT USE! PRIVATE VARIABLE
 var _current_isAvailableMethod:String = "" # DO NOT USE! PRIVATE VARIABLE
 var _current_isAvailableMethod_result:bool # DO NOT USE! PRIVATE VARIABLE
 var _current_canReview:bool # DO NOT USE! PRIVATE VARIABLE
 var _current_canShowPrompt:bool # DO NOT USE! PRIVATE VARIABLE
 var _current_rewarded_success:bool # DO NOT USE! PRIVATE VARIABLE
+var _current_get_purchases_then # DO NOT USE! PRIVATE VARIABLE
+var current_rewarded_ad_name = "" # READ BUT DON'T WRITE
+var current_fullscreen_ad_name = "" # READ BUT DON'T WRITE
+
+class Purchase:
+	# product_id from Yandex Console (You specify it yourself)
+	var product_id:String
+	var _js_purchase:JavaScriptObject
+	func _init(__js_purchase:JavaScriptObject):
+		product_id = __js_purchase.productID
+		_js_purchase = __js_purchase
+	# consume() for to remove from array YandexGames.getPurchases() (on the Yandex side)
+	func consume():
+		YandexGames.js_ysdk_payments.consumePurchase(_js_purchase.purchaseToken)
 
 func _ready():
 	if OS.has_feature("HTML5"):
 		print("%s, _ready() OS.has_feature('HTML5') - addon works"%[_print])
+		var js_window = JavaScript.get_interface("window")
+		js_console = JavaScript.get_interface("console")
 		initGame()
 		yield(self, "on_initGame")
 		getPlayer(false)
+		yield(self, "on_getPlayer")
 		getPayments()
 		getLeaderboards()
 	else:
@@ -109,7 +132,6 @@ func initGame():
 		if _print_debug: print("%s, initGame() !OS.has_feature('HTML5') - addon doesn't work, platform is not html"%[_print])
 		return
 	var js_window:JavaScriptObject = JavaScript.get_interface("window")
-	var js_console:JavaScriptObject = JavaScript.get_interface("console")
 #	var js_dictionary:JavaScriptObject = JavaScript.create_object("object")
 	js_window.YaGames.init().then(js_callback_initGame)
 
@@ -124,24 +146,31 @@ func js_callback_initGame(args:Array):
 # https://yandex.ru/dev/games/doc/en/sdk/sdk-adv
 # Managing ads
 # Managing ads - showFullscreenAdv()
-func showFullscreenAdv():
+func showFullscreenAdv(ad_name:String):
 	if not _check_func_valid("showFullscreenAdv", []): return
 	var js_dictionary:JavaScriptObject = JavaScript.create_object("Object")
 	var js_dictionary_2:JavaScriptObject = JavaScript.create_object("Object")
-	var js_console:JavaScriptObject = JavaScript.get_interface("console")
 	js_dictionary_2["onClose"] = js_callback_showFullscreenAdv_onClose
 	js_dictionary_2["onError"] = js_callback_showFullscreenAdv_onError
 	js_dictionary["callbacks"] = js_dictionary_2
 	if _print_debug: js_console.log(js_dictionary)
+	current_fullscreen_ad_name = ad_name
+	now_fullscreen = true
 	js_ysdk.adv.showFullscreenAdv(js_dictionary)
 
 func js_callback_showFullscreenAdv_onClose(args:Array):
 	if _print_debug: print("%s js_callback_showFullscreenAdv_onClose(args:%s)"%[_print, args])
 	var wasShown:bool = args[0]
-	emit_signal("on_showFullscreenAdv", wasShown)
+	var copy_current_fullscreen_ad_name = current_fullscreen_ad_name
+	current_fullscreen_ad_name = ""
+	now_fullscreen = false
+	emit_signal("on_showFullscreenAdv", wasShown, copy_current_fullscreen_ad_name)
 func js_callback_showFullscreenAdv_onError(args:Array):
 	if _print_debug: print("%s js_callback_showFullscreenAdv_onError(args:%s)"%[_print, args])
-	emit_signal("on_showFullscreenAdv", false)
+	var copy_current_fullscreen_ad_name = current_fullscreen_ad_name
+	current_fullscreen_ad_name = ""
+	now_fullscreen = false
+	emit_signal("on_showFullscreenAdv", false, copy_current_fullscreen_ad_name)
 
 # Managing ads - showRewardedVideo()
 func showRewardedVideo(new_current_rewarded_ad_name:String):
@@ -151,23 +180,25 @@ func showRewardedVideo(new_current_rewarded_ad_name:String):
 	current_rewarded_ad_name = new_current_rewarded_ad_name
 	var js_dictionary:JavaScriptObject = JavaScript.create_object("Object")
 	var js_dictionary_2:JavaScriptObject = JavaScript.create_object("Object")
-	var js_console:JavaScriptObject = JavaScript.get_interface("console")
 	js_dictionary_2["onClose"] = js_callback_showRewardedVideo_onClose
 	js_dictionary_2["onError"] = js_callback_showRewardedVideo_onError
 	js_dictionary_2["onRewarded"] = js_callback_showRewardedVideo_onRewarded
 	js_dictionary["callbacks"] = js_dictionary_2
 	if _print_debug: js_console.log(js_dictionary)
+	now_rewarded = true
 	js_ysdk.adv.showRewardedVideo(js_dictionary)
 
 func js_callback_showRewardedVideo_onClose(args:Array):
 	if _print_debug: print("%s js_callback_showRewardedVideo_onClose(args:%s)"%[_print, args])
 	var ad_name = current_rewarded_ad_name
 	current_rewarded_ad_name = ""
+	now_rewarded = false
 	emit_signal("on_showRewardedVideo", _current_rewarded_success, ad_name)
 func js_callback_showRewardedVideo_onError(args:Array):
 	if _print_debug: print("%s js_callback_showRewardedVideo_onError(args:%s)"%[_print, args])
 	var ad_name = current_rewarded_ad_name
 	_current_rewarded_success = false
+	now_rewarded = false
 	emit_signal("on_showRewardedVideo", _current_rewarded_success, ad_name)
 func js_callback_showRewardedVideo_onRewarded(args:Array):
 	if _print_debug: print("%s js_callback_showRewardedVideo_onRewarded(args:%s)"%[_print, args])
@@ -190,7 +221,6 @@ func getPlayer_yield(scopes:bool):
 func js_callback_getPlayer(args:Array):
 	if _print_debug: 
 		print("%s js_callback_getPlayer(args:%s)"%[_print, args])
-		var js_console = JavaScript.get_interface("console")
 		js_console.log(args[0])
 	js_ysdk_player = args[0]
 	emit_signal("on_getPlayer", js_ysdk_player)
@@ -207,7 +237,6 @@ func setData(data:Dictionary):
 	if _saved_data_json == json_data: return
 	else: _saved_data_json = json_data
 	var js_dictionary:JavaScriptObject = JavaScript.create_object("Object")
-	var js_console = JavaScript.get_interface("console")
 	js_dictionary["json_data"] = json_data
 	js_ysdk_player.setData(js_dictionary).then(js_console.log("YandexGamesSDK setData success"))
 
@@ -221,10 +250,10 @@ func getData():
 	return
 
 func getData_yield() -> Dictionary:
-	if not _check_func_valid("getData_yield", []): return
+	if not _check_func_valid("getData_yield", []): return {}
 	if js_ysdk_player == null: 
 		if _print_debug: print("%s getData_yield() js_ysdk_player == null"%[_print])
-		return
+		return {}
 	var result:Dictionary
 	getData()
 	yield(self, "on_getData")
@@ -235,7 +264,6 @@ func getData_yield() -> Dictionary:
 func js_callback_getData(args:Array):
 	if _print_debug: 
 		print("js_callback_getData(args:%s)"%[args])
-		var js_console = JavaScript.get_interface("console")
 		js_console.log(args[0])
 	var data:Dictionary
 	if args[0].hasOwnProperty('json_data'):
@@ -256,49 +284,55 @@ func getPayments():
 func js_callback_getPayments_then(args:Array):
 	if _print_debug: 
 		print("js_callback_getPayments_then args: ", args)
-		var js_console:JavaScriptObject = JavaScript.get_interface("console")
 		js_console.log(args[0])
 	js_ysdk_payments = args[0]
+	emit_signal("on_getPayments", js_ysdk_payments)
 
 func js_callback_getPayments_catch(args:Array):
 	if _print_debug: 
 		print("js_callback_getPayments_catch args: ", args)
-		var js_console:JavaScriptObject = JavaScript.get_interface("console")
 		js_console.log(args[0])
 
 # https://yandex.ru/dev/games/doc/en/sdk/sdk-purchases#payments-purchase
 # In-game purchases - purchase()
-func purchase(id:String, consume_purchase:bool):
-	if not _check_func_valid("purchase", [id, consume_purchase]): return
+func purchase(id:String):
+	if not _check_func_valid("purchase", [id]): return
 	if js_ysdk_payments == null:
 		if _print_debug: print("%s purchase(id:%s) js_ysdk_payments == null"%[_print, id])
 		return
 	var js_dictionary:JavaScriptObject = JavaScript.create_object("Object")
-#	var js_console = JavaScript.get_interface("console")
 	js_dictionary["id"] = id
-	_current_purchase_is_consume = consume_purchase
-	_current_purchase_produc_id = id
-	js_ysdk_payments.purchase(js_dictionary).then(js_callback_purchases_then).catch(js_callback_purchases_catch)
+	_current_purchase_product_id = id
+	now_purchase = true
+	js_ysdk_payments.purchase(js_dictionary).then(js_callback_purchase_then).catch(js_callback_purchase_catch)
 
-func js_callback_purchases_then(args:Array):
+func js_callback_purchase_then(args:Array):
 	if _print_debug: 
-		print("js_callback_purchases_then args: ", args)
-		var js_console:JavaScriptObject = JavaScript.get_interface("console")
+		print("js_callback_purchase_then args: ", args)
 		js_console.log(args[0])
 	var purchase = args[0]
-	var purchase_productID:String = purchase.productID
-	if _current_purchase_is_consume:
-		js_ysdk_payments.consumePurchase(purchase.purchaseToken)
-	emit_signal("on_purchase_then", purchase_productID)
+	var purchase_result = Purchase.new(purchase)
+	now_purchase = false
+	emit_signal("on_purchase_then", purchase_result)
 
-func js_callback_purchases_catch(args:Array):
+func js_callback_purchase_catch(args:Array):
 	if _print_debug: 
-		print("js_callback_purchases_catch args: ", args)
-		var js_console:JavaScriptObject = JavaScript.get_interface("console")
+		print("js_callback_purchase_catch args: ", args)
 		js_console.log(args[0])
-	var copy_current_purchase_produc_id = _current_purchase_produc_id
-	_current_purchase_produc_id = ""
-	emit_signal("on_purchase_catch", copy_current_purchase_produc_id)
+	var copy_current_purchase_product_id = _current_purchase_product_id
+	_current_purchase_product_id = ""
+	now_purchase = false
+	emit_signal("on_purchase_catch", copy_current_purchase_product_id)
+
+# return [Purchase]
+func getPurchases_yield() -> Array:
+	if not _check_func_valid("getPurchases_yield", []):
+		printerr("getPurchases_yield() not _check_func_valid")
+	if js_ysdk_payments == null:
+		if _print_debug: printerr("%s getPurchases js_ysdk_payments == null"%[_print])
+	getPurchases()
+	yield(self, "on_getPurchases")
+	return _current_get_purchases_then
 
 func getPurchases():
 	if not _check_func_valid("getPurchases", []): return
@@ -309,23 +343,18 @@ func getPurchases():
 
 func js_callback_getPurchases_then(args:Array):
 	if _print_debug:
-		print("%s js_callback_getPurchases_then(args:%s)"%[_print, args])
-		var js_console:JavaScriptObject = JavaScript.get_interface("console")
-		js_console.log(args[0])
-		js_console.log(args[0].length)
-		js_console.log(args[0][0])
+		js_console.log(_print, " js_callback_getPurchases_then(args: ", args[0], ")")
 	var result:Array = []
-	var arr_length = args[0].length
 	for id in args[0].length:
-		result.append(args[0][id].productID)
-	emit_signal("on_getPurchases_then", result)
+		result.append(Purchase.new(args[0][id]))
+	_current_get_purchases_then = result
+	emit_signal("on_getPurchases", result)
 
 func js_callback_getPurchases_catch(args:Array):
 	if _print_debug:
-		print("%s js_callback_getPurchases_then(args:%s)"%[_print, args])
-		var js_console:JavaScriptObject = JavaScript.get_interface("console")
-		js_console.log(args[0])
-	emit_signal("on_getPurchases_catch")
+		js_console.log(_print, " js_callback_getPurchases_catch(args: ", args[0], ")")
+	_current_get_purchases_then = null
+	emit_signal("on_getPurchases", null)
 
 # https://yandex.ru/dev/games/doc/en/sdk/sdk-leaderboard
 # Leaderboards
@@ -337,7 +366,6 @@ func getLeaderboards():
 func js_callback_getLeaderboards(args:Array):
 	if _print_debug: 
 		print("%s js_callback_getLeaderboards(args:%s)"%[_print, args])
-		var js_console:JavaScriptObject = JavaScript.get_interface("console")
 		js_console.log(args[0])
 	js_ysdk_lb = args[0]
 	emit_signal("on_getLeaderboards")
@@ -383,7 +411,6 @@ func js_LeaderboardPlayerEntry_to_Dictionary(object:JavaScriptObject) -> Diction
 func js_callback_getLeaderboardDescription(args:Array):
 	if _print_debug: 
 		print("%s js_callback_getLeaderboardDescription(args:%s)"%[_print, args])
-		var js_console:JavaScriptObject = JavaScript.get_interface("console")
 		js_console.log(args[0])
 	var js_desc:JavaScriptObject = args[0]
 	var description:Dictionary = js_LeaderboardDescription_to_Dictionary(js_desc)
@@ -420,7 +447,6 @@ func getLeaderboardPlayerEntry(leaderboardName:String):
 func js_callback_getLeaderboardPlayerEntry_then(args:Array):
 	if _print_debug:
 		print("%s js_callback_getLeaderboardPlayerEntry_then(args:%s)"%[_print, args])
-		var js_console:JavaScriptObject = JavaScript.get_interface("console")
 		js_console.log(args[0])
 	var js_response:JavaScriptObject = args[0]
 	var response:Dictionary = js_LeaderboardPlayerEntry_to_Dictionary(js_response)
@@ -430,7 +456,6 @@ func js_callback_getLeaderboardPlayerEntry_then(args:Array):
 func js_callback_getLeaderboardPlayerEntry_catch(args:Array):
 	if _print_debug: 
 		print("%s js_callback_getLeaderboardPlayerEntry_catch(args:%s)"%[_print, args])
-		var js_console:JavaScriptObject = JavaScript.get_interface("console")
 		js_console.log(args[0])
 	emit_signal("on_getLeaderboardPlayerEntry_catch", args[0].code)
 
@@ -449,7 +474,6 @@ func getLeaderboardEntries(leaderboardName:String):
 func js_callback_getLeaderboardEntries_then(args:Array):
 	if _print_debug: 
 		print("%s js_callback_getLeaderboardEntries_then(args:%s)"%[_print, args])
-		var js_console:JavaScriptObject = JavaScript.get_interface("console")
 		js_console.log(args[0])
 	var response:Dictionary = {'leaderboard': {}, 'userRank':-1, 'entries':[]}
 	response['leaderboard'] = js_LeaderboardDescription_to_Dictionary(args[0]['leaderboard'])
@@ -462,7 +486,6 @@ func js_callback_getLeaderboardEntries_then(args:Array):
 func js_callback_getLeaderboardEntries_catch(args:Array):
 	if _print_debug: 
 		print("%s js_callback_getLeaderboardEntries_catch(args:%s)"%[_print, args])
-		var js_console:JavaScriptObject = JavaScript.get_interface("console")
 		js_console.log(args[0])
 
 # https://yandex.ru/dev/games/doc/en/sdk/sdk-review
@@ -483,7 +506,6 @@ func on_canReview_yield() -> bool:
 func js_callback_canReview(args:Array):
 	if _print_debug: 
 		print("%s js_callback_canReview(args:%s)"%[_print, args])
-		var js_console:JavaScriptObject = JavaScript.get_interface("console")
 		js_console.log(args[0])
 	if args[0]["value"]:
 		if _print_debug: 
@@ -493,7 +515,6 @@ func js_callback_canReview(args:Array):
 	else:
 		if _print_debug: 
 			print("%s js_callback_canReview(args:%s) canReview == false"%[_print, args])
-			var js_console:JavaScriptObject = JavaScript.get_interface("console")
 			js_console.log(args[0]["reason"])
 		_current_canReview = false
 		emit_signal("on_canReview", false)
@@ -504,14 +525,15 @@ func requestReview():
 	canReview()
 	yield(self, "on_canReview")
 	if _current_canReview:
+		now_review = true
 		js_ysdk.feedback.requestReview().then(js_callback_requestReview)
 	elif _print_debug: print("%s requestReview() _current_canReview = false"%[_print])
 
 func js_callback_requestReview(args:Array):
 	if _print_debug: 
 		print("%s js_callback_requestReview(args:%s)"%[_print, args])
-		var js_console:JavaScriptObject = JavaScript.get_interface("console")
 		js_console.log(args[0])
+	now_review = false
 	emit_signal("on_requestReview", args[0])
 
 # return user lang - en/ru/tr/...
@@ -537,7 +559,6 @@ func canShowPrompt():
 func js_callback_canShowPrompt(args:Array):
 	if _print_debug: 
 		print("%s js_callback_canShowPrompt(args:%s)"%[_print, args])
-		var js_console:JavaScriptObject = JavaScript.get_interface("console")
 		js_console.log(args[0].canShow)
 	_current_canShowPrompt = args[0].canShow
 	emit_signal("on_canShowPrompt", _current_canShowPrompt)
@@ -562,7 +583,6 @@ func showPrompt():
 func js_callback_showPrompt(args:Array):
 	if _print_debug: 
 		print("%s js_callback_showPrompt(args:%s)"%[_print, args])
-		var js_console:JavaScriptObject = JavaScript.get_interface("console")
 		js_console.log(args[0].outcome)
 	emit_signal("on_showPrompt", args[0].outcome == 'accepted')
 
