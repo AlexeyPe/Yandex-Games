@@ -3,10 +3,7 @@
 ![GitHub License](https://img.shields.io/github/license/AlexeyPe/Yandex-Games)
 ![GitHub Repo stars](https://img.shields.io/github/stars/AlexeyPe/Yandex-Games)
 
-* Yandex Games SDK for Godot 3.5
-* Godot 4 - If JavaScript and JavaScriptObject work the same way as in 3, then try it, you will also need to solve the issue with the header files of version 4
-
-__If you have ideas for improvement, write to [telegram](https://t.me/Alexey_Pe) / Issues / pull, I’ll read everything__
+__If you have ideas for improvement, write me to [telegram](https://t.me/Alexey_Pe) / Issues / pull, I’ll read everything__
 
 __My Telegram [@Alexey_Pe](https://t.me/Alexey_Pe)__
 
@@ -25,7 +22,9 @@ This addon is used by many developers, I added those who don’t mind ([write to
 
 № | Developer | Players |
 -- | -- | -- |
-1 | [Legatum Studio](https://yandex.ru/games/developer?name=Legatum%20Studio) | 100+ |
+1 | [RA Games](https://yandex.ru/games/developer?name=RA%20Games) | 1 500 000 + |
+2 | [Magikelle Studio Yandex](https://yandex.ru/games/developer?name=Magikelle%20Studio%20Yandex) | 1000+ |
+3 | [Legatum Studio](https://yandex.ru/games/developer?name=Legatum%20Studio) | 100+ |
 
 ## How use
 * When the game starts, the addon automatically calls `initGame()`, `getPlayer(false)`, `getPayments()`, `getLeaderboards()`
