@@ -109,6 +109,10 @@ class Purchase:
 	func consume():
 		YandexGames.js_ysdk_payments.consumePurchase(_js_purchase.purchaseToken)
 
+func ready():
+	assert(js_ysdk != null, "%s, js_ysdk == null, before calling ready(), call initGame() and wait for on_initGame(), then you can call ready()"%[_print])
+	js_ysdk.features.LoadingAPI.ready()
+
 func _ready():
 	if OS.has_feature("HTML5"):
 		print("%s, _ready() OS.has_feature('HTML5') - addon works"%[_print])
@@ -138,7 +142,6 @@ func initGame():
 func js_callback_initGame(args:Array):
 	if _print_debug: print("%s js_callback_initGame(args:%s)"%[_print, args])
 	js_ysdk = args[0]
-	js_ysdk.features.LoadingAPI.ready()
 	is_initGame = true
 	emit_signal("on_initGame")
 	if _print_debug: print("%s js_callback_initGame(args:%s) is_initGame = true"%[_print, args])
