@@ -29,6 +29,10 @@ This addon is used by many developers, I added those who don’t mind ([write to
 ## How use
 * When the game starts, the addon automatically calls `initGame()`, `getPlayer(false)`, `getPayments()`, `getLeaderboards()`
 * For more understanding, you can read [YandexGames.gd](addons/YandexGamesSDK/YandexGames.gd) and sdk documentation
+
+> [!IMPORTANT]
+> When the game is ready to be shown to the player, call `YandexGames.ready()` - for example, after loading the save `getData()`, you can call this function
+
 ### Ads
 * After the release, commercial advertising will work after a few hours. Just wait
 * When calling an advertisement, check whether the advertisement is currently called. [link to video(bug)](https://disk.yandex.ru/i/sYeNKd5tYS4nEw)
@@ -244,6 +248,9 @@ YandexGames.connect("on_showPrompt", self, "on_showPrompt")
 ``` gdscript
 # getLang() -> String (ru/en/tr/...)
 YandexGames.getLang()
+
+# Notifies Yandex that the game is ready
+YandexGames.ready()
 
 # Device Info
 match YandexGames.js_ysdk.deviceInfo["_type"]:
