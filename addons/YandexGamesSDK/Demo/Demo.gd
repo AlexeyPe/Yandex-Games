@@ -63,6 +63,9 @@ func on_purchase_then(purchase:YandexGames.Purchase):
 func on_initGame(): 
 	print("demo on_initGame()")
 #	YandexGames.getPlayer(false)
+#	Usually you will want to call ready() (without _) when you load the player data using getData()
+#	I called this in on_initGame to simplify the demo
+	YandexGames.ready() 
 
 func on_showRewardedVideo(success:bool, ad_name:String):
 	print("on_showRewardedVideo(success:%s, ad_name:%s)"%[success, ad_name])
@@ -161,3 +164,16 @@ func _on_Button_getLeaderboardEntries_pressed():
 	# Before calling the function, make sure that getLeaderboards was called, by default it is called in YandexGanes._ready()
 	YandexGames.getLeaderboardEntries("test")
 
+func _on_Button_getFlags_pressed():
+	var flags = yield(YandexGames.getFlags_yield(), "completed")
+	if flags is Dictionary: pass # you code here 
+	print("_on_Button_getFlags_pressed(), flags:", flags)
+
+
+func _on_Button_getFlags2_pressed():
+	var flags = yield(YandexGames.getFlags_yield([
+		{"name":"var_1", "value":"20"},
+		{"name":"var_2", "value":"33"},
+	]), "completed")
+	if flags is Dictionary: pass # you code here
+	print("_on_Button_getFlags2_pressed(), flags:", flags)

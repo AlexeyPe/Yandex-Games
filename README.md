@@ -122,6 +122,28 @@ func saveData(from:Object):
   YandexGames.setData(data)
   pass
 ```
+### [Remote Config](https://yandex.ru/dev/games/doc/en/sdk/sdk-config)
+![img](https://i.imgur.com/uboXtk8.png)
+![img](https://i.imgur.com/536qgW1.png)
+``` gdscript
+# example 1
+var flags = yield(YandexGames.getFlags_yield(), "completed")
+if flags is Dictionary: pass # you code here
+
+# example 2
+var flags = yield(YandexGames.getFlags_yield([
+	{"name":"var_1", "value":"20"},
+	{"name":"var_2", "value":"33"},
+]), "completed")
+if flags is Dictionary: pass # you code here
+
+# getFlags_yield() uses the on_getFlags signal
+YandexGames.connect("on_getFlags", self, "on_getFlags")
+func on_getFlags(response):
+    if response is Dictionary: pass # flags
+	else: pass # js error (the error will be printed in the browser console)
+```
+
 ### Purchases
 * For purchases, you need to create purchases in the draft and add your login - this is enough for tests. 
 (when buying, it will be written that it is a test)

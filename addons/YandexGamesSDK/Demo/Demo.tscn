@@ -218,6 +218,20 @@ margin_bottom = 116.0
 text = "getLeaderboardEntries(\"test\")"
 align = 0
 
+[node name="Button_getFlags" type="Button" parent="CenterContainer/VBoxContainer/HBoxContainer/VBoxContainer3"]
+margin_top = 120.0
+margin_right = 234.0
+margin_bottom = 140.0
+text = "getFlags()"
+align = 0
+
+[node name="Button_getFlags2" type="Button" parent="CenterContainer/VBoxContainer/HBoxContainer/VBoxContainer3"]
+margin_top = 144.0
+margin_right = 234.0
+margin_bottom = 164.0
+text = "getFlags(clientFeatures) (with args)"
+align = 0
+
 [connection signal="pressed" from="CenterContainer/VBoxContainer/HBoxContainer/VBoxContainer/HBoxContainer/Button_Score" to="." method="_on_Button_Score_pressed"]
 [connection signal="pressed" from="CenterContainer/VBoxContainer/HBoxContainer/VBoxContainer/Button_showFullscreenAdv" to="." method="_on_Button_showFullscreenAdv_pressed"]
 [connection signal="pressed" from="CenterContainer/VBoxContainer/HBoxContainer/VBoxContainer/Button_showRewardedVideo" to="." method="_on_Button_showRewardedVideo_pressed"]
@@ -238,3 +252,5 @@ align = 0
 [connection signal="pressed" from="CenterContainer/VBoxContainer/HBoxContainer/VBoxContainer3/Button_getLeaderboardDescription" to="." method="_on_Button_getLeaderboardDescription_pressed"]
 [connection signal="pressed" from="CenterContainer/VBoxContainer/HBoxContainer/VBoxContainer3/Button_getLeaderboardPlayerEntry" to="." method="_on_Button_getLeaderboardPlayerEntry_pressed"]
 [connection signal="pressed" from="CenterContainer/VBoxContainer/HBoxContainer/VBoxContainer3/Button_getLeaderboardEntries" to="." method="_on_Button_getLeaderboardEntries_pressed"]
+[connection signal="pressed" from="CenterContainer/VBoxContainer/HBoxContainer/VBoxContainer3/Button_getFlags" to="." method="_on_Button_getFlags_pressed"]
+[connection signal="pressed" from="CenterContainer/VBoxContainer/HBoxContainer/VBoxContainer3/Button_getFlags2" to="." method="_on_Button_getFlags2_pressed"]

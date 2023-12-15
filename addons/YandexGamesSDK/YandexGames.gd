@@ -28,6 +28,8 @@ signal on_getLeaderboardPlayerEntry_catch(err_code) # err_code
 # response:{leaderboard:Dictionary, userRank:int, entries:[Dictionary]}
 # leaderboard:{ getLeaderboardDescription response }, entries:[{ getLeaderboardPlayerEntry response }]
 signal on_getLeaderboardEntries(response) # response:Dictionary
+# Remote Config https://yandex.ru/dev/games/doc/en/sdk/sdk-config
+signal on_getFlags(response) # response: Dictionary OR js error
 
 const _print:String = "Addon:YandexGamesSDK, YandexGames.gd"
 var _print_debug:bool = true
@@ -76,6 +78,9 @@ var js_callback_requestReview = JavaScript.create_callback(self, "js_callback_re
 # Desktop shortcut
 var js_callback_canShowPrompt = JavaScript.create_callback(self, "js_callback_canShowPrompt")
 var js_callback_showPrompt = JavaScript.create_callback(self, "js_callback_showPrompt")
+# Remote Config  https://yandex.ru/dev/games/doc/en/sdk/sdk-config
+var js_callback_getFlags_catch = JavaScript.create_callback(self, "js_callback_getFlags_catch")
+var js_callback_getFlags_then = JavaScript.create_callback(self, "js_callback_getFlags_then")
 
 var js_callback_isAvailableMethod = JavaScript.create_callback(self, "js_callback_isAvailableMethod")
 
@@ -95,6 +100,8 @@ var _current_canReview:bool # DO NOT USE! PRIVATE VARIABLE
 var _current_canShowPrompt:bool # DO NOT USE! PRIVATE VARIABLE
 var _current_rewarded_success:bool # DO NOT USE! PRIVATE VARIABLE
 var _current_get_purchases_then # DO NOT USE! PRIVATE VARIABLE
+var _current_getFlags # DO NOT USE! PRIVATE VARIABLE
+
 var current_rewarded_ad_name = "" # READ BUT DON'T WRITE
 var current_fullscreen_ad_name = "" # READ BUT DON'T WRITE
 
@@ -588,6 +595,56 @@ func js_callback_showPrompt(args:Array):
 		print("%s js_callback_showPrompt(args:%s)"%[_print, args])
 		js_console.log(args[0].outcome)
 	emit_signal("on_showPrompt", args[0].outcome == 'accepted')
+
+# clientFeatures = [{"name":String, value:String}]
+func getFlags(clientFeatures:Array = []):
+	if not _check_func_valid("getFlags", [clientFeatures]): return
+	if clientFeatures.empty():
+		js_ysdk.getFlags().then(js_callback_getFlags_then).catch(js_callback_getFlags_catch)
+	else:
+		var js_array:JavaScriptObject = JavaScript.create_object("Array")
+		for dictionary in clientFeatures:
+			if dictionary is Dictionary:
+				var js_object = JavaScript.create_object("Object")
+				js_object["name"] = str(dictionary["name"])
+				js_object["value"] = str(dictionary["value"])
+				js_array.push(js_object)
+		if _print_debug: js_console.log("YandexGames, getFlags(), js_array:", js_array)
+		if js_array.length == 0: 
+			js_ysdk.getFlags().then(js_callback_getFlags_then).catch(js_callback_getFlags_catch)
+		else:
+			var js_object = JavaScript.create_object("Object")
+			js_object["clientFeatures"] = js_array
+			js_ysdk.getFlags(js_object).then(js_callback_getFlags_then).catch(js_callback_getFlags_catch)
+
+func js_callback_getFlags_catch(args:Array):
+	if _print_debug:
+		print("%s js_callback_getFlags_catch(args:%s)"%[_print, args])
+		js_console.log(args[0])
+	_current_getFlags = args[0]
+	emit_signal("on_getFlags", args[0])
+
+func js_callback_getFlags_then(args:Array):
+	if _print_debug:
+		print("%s js_callback_getFlags_then(args:%s)"%[_print, args])
+		js_console.log(args[0])
+	
+	var js_Object = JavaScript.get_interface("Object")
+	var js_ArrayKeys = js_Object.keys(args[0])
+	_current_getFlags.clear()
+	for key_id in js_ArrayKeys.length:
+		var key = js_ArrayKeys[key_id]
+		_current_getFlags[key] = args[0][key]
+	emit_signal("on_getFlags", args[0])
+
+# clientFeatures = [{"name":String, value:String}]
+# return Dictionary OR js error
+func getFlags_yield(clientFeatures:Array = []):
+	if not _check_func_valid("getFlags_yield", [clientFeatures]): return
+	getFlags(clientFeatures)
+	yield(self, "on_getFlags")
+	
+	return _current_getFlags
 
 # private function. NOT USE
 func _check_func_valid(print_function_name:String, args:Array) -> bool:
