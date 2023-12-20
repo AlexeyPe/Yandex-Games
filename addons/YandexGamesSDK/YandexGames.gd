@@ -631,11 +631,11 @@ func js_callback_getFlags_then(args:Array):
 	
 	var js_Object = JavaScript.get_interface("Object")
 	var js_ArrayKeys = js_Object.keys(args[0])
-	_current_getFlags.clear()
+	_current_getFlags = {}
 	for key_id in js_ArrayKeys.length:
 		var key = js_ArrayKeys[key_id]
 		_current_getFlags[key] = args[0][key]
-	emit_signal("on_getFlags", args[0])
+	emit_signal("on_getFlags", _current_getFlags)
 
 # clientFeatures = [{"name":String, value:String}]
 # return Dictionary OR js error
@@ -643,7 +643,6 @@ func getFlags_yield(clientFeatures:Array = []):
 	if not _check_func_valid("getFlags_yield", [clientFeatures]): return
 	getFlags(clientFeatures)
 	yield(self, "on_getFlags")
-	
 	return _current_getFlags
 
 # private function. NOT USE
