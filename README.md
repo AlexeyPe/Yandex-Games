@@ -24,14 +24,15 @@ This addon is used by many developers, I added those who don’t mind ([write to
 -- | -- | -- |
 1 | [RA Games](https://yandex.ru/games/developer?name=RA%20Games) | 1 500 000 + |
 2 | [Magikelle Studio Yandex](https://yandex.ru/games/developer?name=Magikelle%20Studio%20Yandex) | 1000+ |
-3 | [Legatum Studio](https://yandex.ru/games/developer?name=Legatum%20Studio) | 100+ |
+3 | [Legatum Studio](https://yandex.ru/games/developer?name=Legatum%20Studio) | 1000+ |
 
 ## How use
 * When the game starts, the addon automatically calls `initGame()`, `getPlayer(false)`, `getPayments()`, `getLeaderboards()`
 * For more understanding, you can read [YandexGames.gd](addons/YandexGamesSDK/YandexGames.gd) and sdk documentation
+* Add `<script src="https://yandex.ru/games/sdk/v2"></script>` to Project/export/html5/head include.
 
 > [!IMPORTANT]
-> When the game is ready to be shown to the player, call `YandexGames.ready()` - for example, after loading the save `getData()`, you can call this function
+> When the game is ready to be shown to the player, call `YandexGames.ready()` - for example, after loading the save `getData()`, you can call this function.
 
 ### Ads
 * After the release, commercial advertising will work after a few hours. Just wait
