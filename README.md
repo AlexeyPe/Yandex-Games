@@ -34,6 +34,18 @@ This addon is used by many developers, I added those who don’t mind ([write to
 > [!IMPORTANT]
 > When the game is ready to be shown to the player, call `YandexGames.ready()` - for example, after loading the save `getData()`, you can call this function.
 
+### Init
+* You can write this code in your singleton or in any node that will handle loading/saving player data.
+```gdscript
+func on_initGame():
+	# Here you can download the player's data, and then confirm that the game is ready to be shown
+	YandexGames.ready() # inform Yandex that the player has uploaded
+
+func _ready():
+	YandexGames.connect("on_initGame", self, "on_initGame") # Connect to the sdk initialization signal
+	if YandexGames.is_initGame: on_initGame() # If for some reason you connected after initialization
+```
+
 ### Ads
 * After the release, commercial advertising will work after a few hours. Just wait
 * When calling an advertisement, check whether the advertisement is currently called. [link to video(bug)](https://disk.yandex.ru/i/sYeNKd5tYS4nEw)
