@@ -29,7 +29,15 @@ This addon is used by many developers, I added those who don’t mind ([write to
 ## How use
 * When the game starts, the addon automatically calls `initGame()`, `getPlayer(false)`, `getPayments()`, `getLeaderboards()`
 * For more understanding, you can read [YandexGames.gd](addons/YandexGamesSDK/YandexGames.gd) and sdk documentation
-* Add `<script src="https://yandex.ru/games/sdk/v2"></script>` to Project/export/html5/head include.
+* Add to Project/export/html5/head include:
+```javascript
+<script src="https://yandex.ru/games/sdk/v2"></script>
+<script>
+function get_url(js, size) {
+	return js(size);
+}
+</script>
+```
 
 > [!IMPORTANT]
 > When the game is ready to be shown to the player, call `YandexGames.ready()` - for example, after loading the save `getData()`, you can call this function.
