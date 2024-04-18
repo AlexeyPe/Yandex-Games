@@ -13,6 +13,10 @@ export var score:int = 0
 export var money:int = 1
 export var path_score_label:NodePath
 export var path_money_label:NodePath
+export var path_photo_texture:NodePath
+export var path_name_label:NodePath
+export var path_id_label:NodePath
+export var path_auth_label:NodePath
 
 func _ready():
 	get_node(path_score_label).text = "Score: %s"%[score]
@@ -177,3 +181,19 @@ func _on_Button_getFlags2_pressed():
 	]), "completed")
 	if flags is Dictionary: pass # you code here
 	print("_on_Button_getFlags2_pressed(), flags:", flags)
+
+
+func _on_Button_getPlayerName_pressed():
+	get_node(path_name_label).text = "Name: " + YandexGames.getPlayerName()
+
+func _on_Button_getPlayerID_pressed():
+	get_node(path_id_label).text = "ID: " + YandexGames.getPlayerID()
+
+func _on_Button_getMyPhoto_pressed():
+	var image: Image = yield(YandexGames.getMyPhoto_yield(), "completed")
+	var texture: ImageTexture = ImageTexture.new()
+	texture.create_from_image(image)
+	get_node(path_photo_texture).texture = texture
+
+func _on_Button_isPlayerAuth_pressed():
+	get_node(path_auth_label).text = "Auth: " + str(YandexGames.isPlayerAuth())
