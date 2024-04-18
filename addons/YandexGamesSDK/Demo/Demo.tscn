@@ -9,6 +9,10 @@ script = ExtResource( 1 )
 money = 10
 path_score_label = NodePath("CenterContainer/VBoxContainer/HBoxContainer/VBoxContainer/HBoxContainer/LabelScore")
 path_money_label = NodePath("CenterContainer/VBoxContainer/HBoxContainer/VBoxContainer2/Label_Money")
+path_photo_texture = NodePath("CenterContainer/VBoxContainer/HBoxContainer2/PhotoPlayer")
+path_name_label = NodePath("CenterContainer/VBoxContainer/HBoxContainer2/VBoxContainer/PlayerName")
+path_id_label = NodePath("CenterContainer/VBoxContainer/HBoxContainer2/VBoxContainer/PlayerID")
+path_auth_label = NodePath("CenterContainer/VBoxContainer/HBoxContainer2/VBoxContainer/PlayerAuth")
 
 [node name="CenterContainer" type="CenterContainer" parent="."]
 anchor_right = 1.0
@@ -16,28 +20,67 @@ anchor_bottom = 1.0
 
 [node name="VBoxContainer" type="VBoxContainer" parent="CenterContainer"]
 margin_left = 197.0
-margin_top = 167.0
+margin_top = 66.0
 margin_right = 827.0
-margin_bottom = 433.0
+margin_bottom = 534.0
 
 [node name="TextEdit" type="TextEdit" parent="CenterContainer/VBoxContainer"]
 margin_right = 630.0
-margin_bottom = 60.0
-rect_min_size = Vector2( 0, 60 )
+margin_bottom = 150.0
+rect_min_size = Vector2( 0, 150 )
 text = "	Project -> Export -> HTML
 	Head Include (add a line below)
-	<script src=\"https://yandex.ru/games/sdk/v2\"></script>"
+	<script src=\"https://yandex.ru/games/sdk/v2\"></script>
+	<script>
+	function get_url(js, size) {
+		return js(size);
+	}
+	</script>"
 readonly = true
 
-[node name="HBoxContainer" type="HBoxContainer" parent="CenterContainer/VBoxContainer"]
-margin_top = 64.0
+[node name="HBoxContainer2" type="HBoxContainer" parent="CenterContainer/VBoxContainer"]
+margin_top = 154.0
 margin_right = 630.0
-margin_bottom = 266.0
+margin_bottom = 204.0
+
+[node name="PhotoPlayer" type="TextureRect" parent="CenterContainer/VBoxContainer/HBoxContainer2"]
+margin_right = 50.0
+margin_bottom = 50.0
+rect_min_size = Vector2( 50, 50 )
+expand = true
+stretch_mode = 6
+
+[node name="VBoxContainer" type="VBoxContainer" parent="CenterContainer/VBoxContainer/HBoxContainer2"]
+margin_left = 54.0
+margin_right = 96.0
+margin_bottom = 50.0
+
+[node name="PlayerName" type="Label" parent="CenterContainer/VBoxContainer/HBoxContainer2/VBoxContainer"]
+margin_right = 42.0
+margin_bottom = 14.0
+text = "Name:"
+
+[node name="PlayerID" type="Label" parent="CenterContainer/VBoxContainer/HBoxContainer2/VBoxContainer"]
+margin_top = 18.0
+margin_right = 42.0
+margin_bottom = 32.0
+text = "ID: "
+
+[node name="PlayerAuth" type="Label" parent="CenterContainer/VBoxContainer/HBoxContainer2/VBoxContainer"]
+margin_top = 36.0
+margin_right = 42.0
+margin_bottom = 50.0
+text = "Auth: "
+
+[node name="HBoxContainer" type="HBoxContainer" parent="CenterContainer/VBoxContainer"]
+margin_top = 208.0
+margin_right = 630.0
+margin_bottom = 468.0
 custom_constants/separation = 8
 
 [node name="VBoxContainer" type="VBoxContainer" parent="CenterContainer/VBoxContainer/HBoxContainer"]
 margin_right = 190.0
-margin_bottom = 202.0
+margin_bottom = 260.0
 rect_min_size = Vector2( 190, 0 )
 custom_constants/separation = 6
 
@@ -118,7 +161,7 @@ align = 0
 [node name="VBoxContainer2" type="VBoxContainer" parent="CenterContainer/VBoxContainer/HBoxContainer"]
 margin_left = 198.0
 margin_right = 388.0
-margin_bottom = 202.0
+margin_bottom = 260.0
 rect_min_size = Vector2( 190, 0 )
 custom_constants/separation = 6
 
@@ -182,7 +225,7 @@ align = 0
 [node name="VBoxContainer3" type="VBoxContainer" parent="CenterContainer/VBoxContainer/HBoxContainer"]
 margin_left = 396.0
 margin_right = 630.0
-margin_bottom = 202.0
+margin_bottom = 260.0
 
 [node name="Button_getLeaderboards" type="Button" parent="CenterContainer/VBoxContainer/HBoxContainer/VBoxContainer3"]
 margin_right = 234.0
@@ -232,6 +275,34 @@ margin_bottom = 164.0
 text = "getFlags(clientFeatures) (with args)"
 align = 0
 
+[node name="Button_getPlayerName" type="Button" parent="CenterContainer/VBoxContainer/HBoxContainer/VBoxContainer3"]
+margin_top = 168.0
+margin_right = 234.0
+margin_bottom = 188.0
+text = "getPlayerName()"
+align = 0
+
+[node name="Button_getPlayerID" type="Button" parent="CenterContainer/VBoxContainer/HBoxContainer/VBoxContainer3"]
+margin_top = 192.0
+margin_right = 234.0
+margin_bottom = 212.0
+text = "getPlayerID()"
+align = 0
+
+[node name="Button_getMyPhoto" type="Button" parent="CenterContainer/VBoxContainer/HBoxContainer/VBoxContainer3"]
+margin_top = 216.0
+margin_right = 234.0
+margin_bottom = 236.0
+text = "getMyPhoto_yield(\"small\")"
+align = 0
+
+[node name="Button_isPlayerAuth" type="Button" parent="CenterContainer/VBoxContainer/HBoxContainer/VBoxContainer3"]
+margin_top = 240.0
+margin_right = 234.0
+margin_bottom = 260.0
+text = "isPlayerAuth()"
+align = 0
+
 [connection signal="pressed" from="CenterContainer/VBoxContainer/HBoxContainer/VBoxContainer/HBoxContainer/Button_Score" to="." method="_on_Button_Score_pressed"]
 [connection signal="pressed" from="CenterContainer/VBoxContainer/HBoxContainer/VBoxContainer/Button_showFullscreenAdv" to="." method="_on_Button_showFullscreenAdv_pressed"]
 [connection signal="pressed" from="CenterContainer/VBoxContainer/HBoxContainer/VBoxContainer/Button_showRewardedVideo" to="." method="_on_Button_showRewardedVideo_pressed"]
@@ -254,3 +325,7 @@ align = 0
 [connection signal="pressed" from="CenterContainer/VBoxContainer/HBoxContainer/VBoxContainer3/Button_getLeaderboardEntries" to="." method="_on_Button_getLeaderboardEntries_pressed"]
 [connection signal="pressed" from="CenterContainer/VBoxContainer/HBoxContainer/VBoxContainer3/Button_getFlags" to="." method="_on_Button_getFlags_pressed"]
 [connection signal="pressed" from="CenterContainer/VBoxContainer/HBoxContainer/VBoxContainer3/Button_getFlags2" to="." method="_on_Button_getFlags2_pressed"]
+[connection signal="pressed" from="CenterContainer/VBoxContainer/HBoxContainer/VBoxContainer3/Button_getPlayerName" to="." method="_on_Button_getPlayerName_pressed"]
+[connection signal="pressed" from="CenterContainer/VBoxContainer/HBoxContainer/VBoxContainer3/Button_getPlayerID" to="." method="_on_Button_getPlayerID_pressed"]
+[connection signal="pressed" from="CenterContainer/VBoxContainer/HBoxContainer/VBoxContainer3/Button_getMyPhoto" to="." method="_on_Button_getMyPhoto_pressed"]
+[connection signal="pressed" from="CenterContainer/VBoxContainer/HBoxContainer/VBoxContainer3/Button_isPlayerAuth" to="." method="_on_Button_isPlayerAuth_pressed"]
