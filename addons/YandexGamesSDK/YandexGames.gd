@@ -30,6 +30,7 @@ signal on_getLeaderboardPlayerEntry_catch(err_code) # err_code
 signal on_getLeaderboardEntries(response) # response:Dictionary
 # Remote Config https://yandex.ru/dev/games/doc/en/sdk/sdk-config
 signal on_getFlags(response) # response: Dictionary OR js error
+signal on_getPhotoPlayer(image, binds) # image: Image, binds: Array
 
 const _print:String = "Addon:YandexGamesSDK, YandexGames.gd"
 var _print_debug:bool = true
@@ -101,6 +102,8 @@ var _current_canShowPrompt:bool # DO NOT USE! PRIVATE VARIABLE
 var _current_rewarded_success:bool # DO NOT USE! PRIVATE VARIABLE
 var _current_get_purchases_then # DO NOT USE! PRIVATE VARIABLE
 var _current_getFlags # DO NOT USE! PRIVATE VARIABLE
+var _index_photo: int = 0 # DO NOT USE! PRIVATE VARIABLE
+var _current_getPhotoPlayer: Dictionary # DO NOT USE! PRIVATE VARIABLE
 
 var current_rewarded_ad_name = "" # READ BUT DON'T WRITE
 var current_fullscreen_ad_name = "" # READ BUT DON'T WRITE
@@ -475,10 +478,10 @@ func getLeaderboardEntries(leaderboardName:String):
 	if js_ysdk_lb == null:
 		if _print_debug: print("%s getLeaderboardEntries(leaderboardName:%s) js_ysdk_lb == null"%[_print, leaderboardName])
 		return
-	var js_dictionary:JavaScriptObject = JavaScript.create_object("object")
+	var js_dictionary:JavaScriptObject = JavaScript.create_object("Object")
 	js_dictionary["quantityTop"] = 20
 	js_dictionary["quantityAround"] = 10
-	js_dictionary["includeUser"] = true
+	js_dictionary["includeUser"] = isPlayerAuth()
 	js_ysdk_lb.getLeaderboardEntries(leaderboardName, js_dictionary).then(js_callback_getLeaderboardEntries_then)
 
 func js_callback_getLeaderboardEntries_then(args:Array):
@@ -644,6 +647,78 @@ func getFlags_yield(clientFeatures:Array = []):
 	getFlags(clientFeatures)
 	yield(self, "on_getFlags")
 	return _current_getFlags
+
+
+
+# is an authorized player on yandex games
+func isPlayerAuth() -> bool:
+	return str(js_ysdk_player.getMode()) != "lite"
+
+func getPlayerName() -> String:
+	return str(js_ysdk_player.getName())
+
+func getPlayerID() -> String:
+	return js_ysdk_player.getUniqueID()
+
+func getMyPhoto_yield(size: String = "medium") -> Image:
+	var url: String = js_ysdk_player.getPhoto(size)
+	
+	var http_request = HTTPRequest.new()
+	add_child(http_request)
+	http_request.connect("request_completed", self, "load_img", [["my_photo"], http_request], 4)
+	http_request.request(url)
+	
+	var image: Image
+	while true:
+		yield(self,"on_getPhotoPlayer")
+		if "my_photo" == _current_getPhotoPlayer["binds"][0]:
+			image = _current_getPhotoPlayer["image"]
+			break
+	
+	return image
+
+# gets a photo of a player from the leaderboard
+# js_avatar - JavaScriptObject from liderboard["entries"][0]["getAvatarSrc"] (liderboard - responce signal on_getLeaderboardEntries(response:Dictionary))
+# size - "small", "medium" or "large"
+# signal on_getPhotoPlayer(image: Image, binds: Array)
+func getPhotoPlayer(js_avatar: JavaScriptObject, size: String = "medium", binds: Array = []):
+	var js_window = JavaScript.get_interface("window")
+	var url = js_window.get_url(js_avatar, size)
+	
+	var http_request = HTTPRequest.new()
+	add_child(http_request)
+	http_request.connect("request_completed", self, "load_img", [binds, http_request], 4)
+	http_request.request(url)
+
+func getPhotoPlayer_yield(js_avatar: JavaScriptObject, size: String = "medium") -> Image:
+	_index_photo += 1
+	var this_index: int = _index_photo
+	getPhotoPlayer(js_avatar, size, [this_index])
+	var image: Image
+	while true:
+		yield(self,"on_getPhotoPlayer")
+		if this_index == _current_getPhotoPlayer["binds"][0]:
+			image = _current_getPhotoPlayer["image"]
+			break
+	
+	return image
+
+func load_img(result, response_code, headers: PoolStringArray, body, binds, this_http: HTTPRequest):
+	var image = Image.new()
+	if headers[0].count("png") > 0:
+		if image.load_png_from_buffer(body) != OK:
+			if image.load_webp_from_buffer(body) != OK:
+				image = null
+	else:
+		if image.load_webp_from_buffer(body) != OK:
+			if image.load_png_from_buffer(body) != OK:
+				image = null
+	
+	this_http.queue_free()
+	_current_getPhotoPlayer = {"image": image, "binds": binds}
+	emit_signal("on_getPhotoPlayer", image, binds)
+
+
 
 # private function. NOT USE
 func _check_func_valid(print_function_name:String, args:Array) -> bool:
